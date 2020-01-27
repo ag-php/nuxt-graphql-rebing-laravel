@@ -4,8 +4,7 @@ require('dotenv').config();
 module.exports = {
   mode: 'universal',
   env: {
-    //gqlEndpoint: process.env.GQL_ENDPOINT || 'http://127.0.0.1:8000/graphql'
-    gqlEndpoint: process.env.GQL_ENDPOINT || 'https://backend.axisplanningandconsulting.com/graphql'
+    gqlEndpoint: process.env.GQL_ENDPOINT || 'http://127.0.0.1:8000/graphql'
   },
   /*
   ** Headers of the page
