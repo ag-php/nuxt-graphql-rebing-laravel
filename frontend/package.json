@@ -1,0 +1,36 @@
+{
+  "name": "axis2-frontend",
+  "version": "1.0.0",
+  "description": "Axis",
+  "author": "cyrrill",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+    "build": "nuxt build",
+    "start": "cross-env NODE_ENV=production node server/index.js",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/dotenv": "^1.4.0",
+    "@nuxtjs/pwa": "^3.0.0-beta.19",
+    "cookieparser": "^0.1.0",
+    "cross-env": "^7.0.0",
+    "echarts": "^4.5.0",
+    "element-ui": "^2.4.11",
+    "express": "^4.16.4",
+    "graphql-request": "^1.8.2",
+    "js-cookie": "^2.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "nuxt": "^2.0.0",
+    "path": "^0.12.7",
+    "snapsvg": "^0.5.1",
+    "vue-count-to": "^1.0.13"
+  },
+  "devDependencies": {
+    "imports-loader": "^0.8.0",
+    "node-sass": "^4.13.0",
+    "nodemon": "^1.18.9",
+    "pm2": "^4.2.1",
+    "sass-loader": "^8.0.0"
+  }
+}
