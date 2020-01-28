@@ -1,5 +1,5 @@
 <template>
-  <div class="board-column">
+  <div class="board-column" :class="boxTheme">
     <div class="titie-box">
       <span>{{titleText}}</span>
     </div>
@@ -11,26 +11,25 @@
 </template>
 
 <script>
-
 export default {
-  name: 'BoxWithTitleBox',
-  components: {
-    
-  },
+  name: "BoxWithTitleBox",
+  components: {},
   props: {
     titleText: {
       type: String,
-      default: 'Header'
+      default: "Header"
     },
     contentText: {
       type: String,
-      default: 'Content'
+      default: "Content"
+    },
+    boxTheme: {
+      type: String,
+      default: "green-blue"
     }
   },
-  methods: {
-    
-  }
-}
+  methods: {}
+};
 </script>
 <style lang="scss" scoped>
 .board-column {
@@ -42,38 +41,80 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  .titie-box{
+  .titie-box {
     width: 80%;
     min-height: 30%;
     height: 30%;
-    border: 3px solid #6eba5c;
-    color: black;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 12px;
     font-weight: 600;
   }
-  .bridge-bar{
+  .bridge-bar {
     width: 3px;
     min-height: 10%;
     height: 10%;
-    background-image: linear-gradient(#6eba5c, black);
   }
-  .content-box{
+  .content-box {
     width: 100%;
     min-height: 60%;
     height: 60%;
-    border: 3px solid black;
-    background: #5acae8;
-    color: white;
+
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 14px;
     font-weight: 600;
   }
+  &.green-blue {
+    .titie-box {
+      border: 3px solid #6eba5c;
+      color: black;
+    }
+    .bridge-bar {
+      background-image: linear-gradient(#6eba5c, black);
+    }
+    .content-box {
+      border: 3px solid black;
+      background: #5acae8;
+      color: white;
+    }
+  }
+  &.green-black {
+    .titie-box {
+      border: 3px solid #6eba5c;
+      color: black;
+    }
+    .bridge-bar {
+      background-image: linear-gradient(#6eba5c, black);
+    }
+    .content-box {
+      border: 3px solid black;
+      background: black;
+      color: white;
+    }
+  }
+  &.green-dark-green {
+    .titie-box {
+      border: 3px solid #6eba5c;
+      color: black;
+    }
+    .bridge-bar {
+      background-image: linear-gradient(#6eba5c, #2b5f2e);
+    }
+    .content-box {
+      border: 3px solid #2b5f2e;
+      background: #6fba5d;
+      color: white;
+    }
+  }
+  &.large-content{
+    .content-box {
+      font-size: 24px;
+    }
+  }
+  
 }
-
 </style>
 
