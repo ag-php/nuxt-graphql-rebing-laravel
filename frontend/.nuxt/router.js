@@ -5,6 +5,7 @@ import scrollBehavior from './router.scrollBehavior.js'
 
 const _e84386c2 = () => interopDefault(import('..\\pages\\dashboard.vue' /* webpackChunkName: "pages_dashboard" */))
 const _1ffdfeba = () => interopDefault(import('..\\pages\\dashboard2.vue' /* webpackChunkName: "pages_dashboard2" */))
+const _622db4c3 = () => interopDefault(import('..\\pages\\dashboardOps.vue' /* webpackChunkName: "pages_dashboardOps" */))
 const _1e875022 = () => interopDefault(import('..\\pages\\data.vue' /* webpackChunkName: "pages_data" */))
 const _4ec4ff18 = () => interopDefault(import('..\\pages\\login.vue' /* webpackChunkName: "pages_login" */))
 const _4a0497aa = () => interopDefault(import('..\\pages\\organizations.vue' /* webpackChunkName: "pages_organizations" */))
@@ -39,6 +40,10 @@ export const routerOptions = {
     path: "/dashboard2",
     component: _1ffdfeba,
     name: "dashboard2"
+  }, {
+    path: "/dashboardOps",
+    component: _622db4c3,
+    name: "dashboardOps"
   }, {
     path: "/data",
     component: _1e875022,

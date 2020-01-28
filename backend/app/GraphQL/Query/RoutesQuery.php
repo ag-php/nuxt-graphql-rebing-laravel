@@ -65,6 +65,11 @@ class RoutesQuery extends AuthenticatedQuery
                     'path' => '/dashboard2',
                     'icon' => 'dashboard',
                 ],
+                [
+                    'name' => 'Dashboard Ops',
+                    'path' => '/dashboardops',
+                    'icon' => 'dashboard',
+                ],
 
             ];
 
