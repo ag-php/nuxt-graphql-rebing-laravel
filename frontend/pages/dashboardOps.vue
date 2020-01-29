@@ -3,12 +3,29 @@
     <h1>Ops Dashboard</h1>
     <br />
     <el-row type="flex" class="row-bg" justify="center">
-      <el-col :span="4" v-for="(topBox, i) in topBoxes" :key="i">
-        <box-with-title-box
-          :titleText="topBox.titleText"
-          :contentText="topBox.contentText"
-          :boxTheme="topBox.boxTheme"
-        ></box-with-title-box>
+      <el-col :span="5" v-for="(topBox, i) in topBoxes" :key="i">
+        <box-with-title-box :boxTheme="topBox.boxTheme">
+          <template v-slot:header>
+            <span>{{topBox.titleText}}</span>
+          </template>
+          <template v-slot:content>
+            <div v-if="i==0">
+              <el-date-picker
+                v-model="value2"
+                type="daterange"
+                align="right"
+                size="mini"
+                unlink-panels
+                start-placeholder="Start"
+                format="MM/dd/yyyy"
+                end-placeholder="End"
+                :clearable="false"
+                :picker-options="pickerOptions"
+              ></el-date-picker>
+            </div>
+            <span v-if="i != 0">{{topBox.contentText}}</span>
+          </template>
+        </box-with-title-box>
       </el-col>
     </el-row>
     <el-row type="flex" class="row-bg" justify="center">
@@ -68,29 +85,43 @@
             <span>LABOR 32.87%</span>
           </template>
           <template v-slot:content>
-            <el-row type="flex" class="row-bg" justify="center" style="width: 100%">
+            <el-row
+              type="flex"
+              class="row-bg"
+              justify="center"
+              style="width: 100%; margin-top: 16px;"
+            >
               <el-col :span="11">
-                <box-with-title-box
-                  titleText="MANAGEMENT"
-                  contentText="9.93%"
-                  boxTheme="green-black"
-                ></box-with-title-box>
+                <box-with-title-box boxTheme="green-black medium-content">
+                  <template v-slot:header>
+                    <span>MANAGEMENT</span>
+                  </template>
+                  <template v-slot:content>
+                    <span>9.93%</span>
+                  </template>
+                </box-with-title-box>
               </el-col>
             </el-row>
             <el-row type="flex" class="row-bg" justify="center" style="width: 100%">
               <el-col :span="11">
-                <box-with-title-box
-                  titleText="MANAGEMENT"
-                  contentText="9.93%"
-                  boxTheme="green-black"
-                ></box-with-title-box>
+                <box-with-title-box boxTheme="green-black medium-content">
+                  <template v-slot:header>
+                    <span>MANAGEMENT</span>
+                  </template>
+                  <template v-slot:content>
+                    <span>9.93%</span>
+                  </template>
+                </box-with-title-box>
               </el-col>
               <el-col :span="11">
-                <box-with-title-box
-                  titleText="MANAGEMENT"
-                  contentText="9.93%"
-                  boxTheme="green-black"
-                ></box-with-title-box>
+                <box-with-title-box boxTheme="green-black medium-content">
+                  <template v-slot:header>
+                    <span>MANAGEMENT</span>
+                  </template>
+                  <template v-slot:content>
+                    <span>9.93%</span>
+                  </template>
+                </box-with-title-box>
               </el-col>
             </el-row>
           </template>
@@ -115,24 +146,17 @@
     </el-row>
 
     <el-row type="flex" class="row-bg" justify="center">
-      <el-col :span="4" v-for="(bottomBox, i) in bottomBoxes" :key="i">
-        <box-with-title-box
-          :titleText="bottomBox.titleText"
-          :contentText="bottomBox.contentText"
-          :boxTheme="bottomBox.boxTheme"
-        ></box-with-title-box>
+      <el-col :span="5" v-for="(bottomBox, i) in bottomBoxes" :key="i">
+        <box-with-title-box :boxTheme="bottomBox.boxTheme">
+          <template v-slot:header>
+            <span>{{bottomBox.titleText}}</span>
+          </template>
+          <template v-slot:content>
+            <span>{{bottomBox.contentText}}</span>
+          </template>
+        </box-with-title-box>
       </el-col>
     </el-row>
-
-    <div>
-      <el-date-picker
-        v-model="month"
-        type="month"
-        placeholder="Pick a month"
-        :picker-options="datePickerOptions"
-        @change="getPeriodNum"
-      ></el-date-picker>
-    </div>
   </div>
 </template>
 
@@ -167,11 +191,64 @@ export default {
       periodNum: 1,
       period: null,
       month: null,
-      datePickerOptions: {
-        disabledDate(date) {
-          return date > new Date() || date < new Date("01/01/2018");
-        }
+      // datePickerOptions: {
+      //   disabledDate(date) {
+      //     return date > new Date() || date < new Date("01/01/2018");
+      //   }
+      // },
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "Last week",
+            onClick(picker) {
+              let curr = new Date(); // get current date
+              let first = curr.getDate() - curr.getDay() - 6; // First day is the day of the month - the day of the week
+              let last = first + 6; // last day is the first day + 6
+
+              let firstday = new Date(curr.setDate(first)).toUTCString();
+              let lastday = new Date(curr.setDate(last)).toUTCString();
+
+              picker.$emit("pick", [firstday, lastday]);
+            }
+          },
+          {
+            text: "Last month",
+            onClick(picker) {
+              // const end = new Date();
+              // const start = new Date();
+              // start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              // picker.$emit("pick", [start, end]);
+              let curr = new Date();
+              let month = curr.getMonth();
+              let year = curr.getFullYear();
+
+              let firstDay = new Date(year, month -1 , 1);
+              let lastDay = new Date(year, month , 0);
+
+              picker.$emit("pick", [firstDay, lastDay]);
+
+            }
+          },
+          {
+            text: "Last 3 months",
+            onClick(picker) {
+              // const end = new Date();
+              // const start = new Date();
+              // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              // picker.$emit("pick", [start, end]);
+              let curr = new Date();
+              let month = curr.getMonth();
+              let year = curr.getFullYear();
+
+              let firstDay = new Date(year, month - 3 , 1);
+              let lastDay = new Date(year, month , 0);
+
+              picker.$emit("pick", [firstDay, lastDay]);
+            }
+          }
+        ]
       },
+      value2: "",
       months: [
         "Jan",
         "Feb",
@@ -303,5 +380,37 @@ export default {
 
 .row-bg {
   padding: 10px 0;
+}
+.el-date-editor {
+  width: 100%;
+  color: white;
+  &.el-input__inner {
+    border: none !important;
+    background: transparent !important;
+    padding: 3px 8px !important;
+  }
+  /deep/ {
+    .el-range__icon {
+      color: white !important;
+    }
+    .el-range-separator {
+      color: white !important;
+    }
+    .el-range-input {
+      background: transparent !important;
+      color: white !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      -webkit-transform: scale(0.9, 1);
+      -moz-transform: scale(0.9, 1);
+      -ms-transform: scale(0.9, 1);
+      -o-transform: scale(0.9, 1);
+      transform: scale(0.9, 1);
+      width: 100%;
+      &::placeholder {
+        color: white;
+      }
+    }
+  }
 }
 </style>

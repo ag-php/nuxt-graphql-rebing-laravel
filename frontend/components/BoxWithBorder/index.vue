@@ -48,6 +48,8 @@ export default {
     justify-content: center;
     align-items: center;
     border: 2px solid black;
+    font-size: 18px;
+    font-weight: 600;
     &.shorter-header {
       width: 80%;
     }
@@ -80,10 +82,18 @@ export default {
             -ms-transform: scale(0.8, 1);
             -o-transform: scale(0.8, 1);
             transform: scale(0.8, 1);
+            color: black;
+            font-weight: 900;
           }
         }
         th:nth-child(2) {
           background: #5acae8 !important;
+        }
+        td:first-child {
+          .cell{
+            color: black;
+            font-weight: 900;
+          }
         }
         td:nth-child(2) {
           background: #5acae8 !important;

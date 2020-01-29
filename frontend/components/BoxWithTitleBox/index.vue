@@ -1,11 +1,11 @@
 <template>
   <div class="board-column" :class="boxTheme">
     <div class="titie-box">
-      <span>{{titleText}}</span>
+      <slot name="header"></slot>
     </div>
     <div class="bridge-bar"></div>
     <div class="content-box">
-      <span>{{contentText}}</span>
+      <slot name="content"></slot>
     </div>
   </div>
 </template>
@@ -15,14 +15,6 @@ export default {
   name: "BoxWithTitleBox",
   components: {},
   props: {
-    titleText: {
-      type: String,
-      default: "Header"
-    },
-    contentText: {
-      type: String,
-      default: "Content"
-    },
     boxTheme: {
       type: String,
       default: "green-blue"
@@ -107,6 +99,11 @@ export default {
       border: 3px solid #2b5f2e;
       background: #6fba5d;
       color: white;
+    }
+  }
+  &.medium-content{
+    .content-box {
+      font-size: 20px;
     }
   }
   &.large-content{
