@@ -352,7 +352,8 @@ export default {
           actual: "140,000",
           percentageOfGoal: "63"
         }
-      ]
+      ],
+      allSales: []
     };
   },
   computed: {},
@@ -363,6 +364,9 @@ export default {
         this.month
       );
     }
+  },
+  async mounted() {
+    this.allSales = await this.$store.dispatch('dashboardOps/getAllSales', {start: "2019-01-01", end: "2020-01-30"})
   }
 };
 </script>

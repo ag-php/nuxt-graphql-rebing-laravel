@@ -20,6 +20,7 @@ let store = {};
   store.modules = store.modules || {}
 
   resolveStoreModules(require('..\\store\\app.js'), 'app.js')
+  resolveStoreModules(require('..\\store\\dashboardOps.js'), 'dashboardOps.js')
   resolveStoreModules(require('..\\store\\graphs.js'), 'graphs.js')
   resolveStoreModules(require('..\\store\\settings.js'), 'settings.js')
   resolveStoreModules(require('..\\store\\user.js'), 'user.js')
@@ -30,6 +31,7 @@ let store = {};
     // Whenever any Vuex module is updated...
     module.hot.accept([
       '..\\store\\app.js',
+      '..\\store\\dashboardOps.js',
       '..\\store\\graphs.js',
       '..\\store\\index.js',
       '..\\store\\settings.js',

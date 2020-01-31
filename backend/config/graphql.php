@@ -112,6 +112,7 @@ return [
                 'graphSixIndividual' => App\GraphQL\Query\GraphSixIndividualQuery::class,
                 'period' => App\GraphQL\Query\PeriodQuery::class,
                 'periodReverse' => App\GraphQL\Query\PeriodReverseQuery::class,
+                'dashboardOps' => App\GraphQL\Query\DashboardSalesQuery::class,
             ],
             'mutation' => [
                 'register' => App\GraphQL\Mutation\RegisterUserMutation::class,
@@ -150,6 +151,7 @@ return [
         'membership' => App\GraphQL\Types\MembershipType::class,
         'organization' => App\GraphQL\Types\OrganizationType::class,
         'accountRevenue' => App\GraphQL\Types\AccountRevenueType::class,
+        'dashboardOps' => App\GraphQL\Types\DashboardOpsType::class
     ],
 
     // The types will be loaded on demand. Default is to load all types on each request
