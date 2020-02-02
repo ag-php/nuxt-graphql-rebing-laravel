@@ -31,15 +31,15 @@ export default {
     min-height: 4px;
     height: 4px;
     &.blue-black {
-      background-image: linear-gradient(to right, #5acae8, black);
+      background-image: linear-gradient(to right, #5acae8, #0b263d);
     }
 
     &.black-blue {
-      background-image: linear-gradient(to right, black, #5acae8);
+      background-image: linear-gradient(to right, #0b263d, #5acae8);
     }
 
     &.black-green {
-      background-image: linear-gradient(to right, black, #6eba5c);
+      background-image: linear-gradient(to right, #0b263d, #6eba5c);
     }
     
   }

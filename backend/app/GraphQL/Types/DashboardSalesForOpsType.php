@@ -5,11 +5,11 @@ namespace App\GraphQL\Types;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class DashboardOpsType extends GraphQLType
+class DashboardSalesForOpsType extends GraphQLType
 {
     protected $attributes = [
-        'name'          => 'DashboardOps',
-        'description'   => 'dashboard parameters',
+        'name'          => 'DashboardSalesForOps',
+        'description'   => 'dashboard sales parameters',
     ];
 
     public function fields(): array

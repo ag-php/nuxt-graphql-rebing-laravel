@@ -18,7 +18,7 @@ class DashboardSalesQuery extends AuthenticatedQuery
 
     public function type(): Type
     {
-        return Type::listOf(GraphQL::type('dashboardOps'));
+        return Type::listOf(GraphQL::type('dashboardSalesForOps'));
     }
 
     public function args(): array
@@ -43,7 +43,7 @@ class DashboardSalesQuery extends AuthenticatedQuery
 
         $sql = <<<SQL
             SELECT
-            `item`, `type`, `amount`
+            `item`, `type`, SUM(`amount`) AS `amount`
             FROM
                 (`ops_dashboard`)
                 WHERE (CONVERT( `type` USING UTF8) = "target" 

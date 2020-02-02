@@ -37,7 +37,7 @@ export function parseTime(time, cFormat) {
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
     // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value] }
     return value.toString().padStart(2, '0')
   })
   return time_str
@@ -160,12 +160,12 @@ export function param2Obj(url) {
   }
   return JSON.parse(
     '{"' +
-      decodeURIComponent(search)
-        .replace(/"/g, '\\"')
-        .replace(/&/g, '","')
-        .replace(/=/g, '":"')
-        .replace(/\+/g, ' ') +
-      '"}'
+    decodeURIComponent(search)
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"')
+      .replace(/\+/g, ' ') +
+    '"}'
   )
 }
 
@@ -244,7 +244,7 @@ export function getTime(type) {
 export function debounce(func, wait, immediate) {
   let timeout, args, context, timestamp, result
 
-  const later = function() {
+  const later = function () {
     // 据上一次触发时间间隔
     const last = +new Date() - timestamp
 
@@ -261,7 +261,7 @@ export function debounce(func, wait, immediate) {
     }
   }
 
-  return function(...args) {
+  return function (...args) {
     context = this
     timestamp = +new Date()
     const callNow = immediate && !timeout
@@ -344,4 +344,46 @@ export function removeClass(ele, cls) {
     const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
     ele.className = ele.className.replace(reg, ' ')
   }
+}
+
+
+/**
+ * Convert float to currency with round
+ * @param {number} data
+ */
+export function convertCurrencySales(data) {
+  return data ? Math.round(data).toLocaleString("en-GB") : 0;
+}
+/**
+ * Get first, last day for current week 
+ */
+export function getCurrentWeekDays() {
+  let dateRange = [];
+
+  let d = new Date;
+
+  let day = d.getDay();
+  let firstday = new Date(d.getFullYear(), d.getMonth(), d.getDate() + (day == 0 ? -6 : 1) - day);
+  let lastday = new Date(d.getFullYear(), d.getMonth(), d.getDate() + (day == 0 ? 0 : 7) - day);
+
+  dateRange.push(firstday);
+  dateRange.push(lastday);
+  return dateRange;
+}
+/**
+ * Get first, last day for last year
+ */
+export function getLastYearDays() {
+  let dateRange = [];
+
+  let curr = new Date();
+  let month = curr.getMonth();
+  let year = curr.getFullYear();
+
+  let firstDay = new Date(year - 1, month - 1, 1).toISOString().slice(0, 10);
+  let lastDay = new Date(year, month - 1, 0).toISOString().slice(0, 10);
+
+  dateRange.push(firstDay);
+  dateRange.push(lastDay);
+  return dateRange;
 }

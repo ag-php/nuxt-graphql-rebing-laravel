@@ -62,13 +62,14 @@ export default {
   &.green-blue {
     .titie-box {
       border: 3px solid #6eba5c;
+      background: white;
       color: black;
     }
     .bridge-bar {
       background-image: linear-gradient(#6eba5c, black);
     }
     .content-box {
-      border: 3px solid black;
+      //border: 3px solid black;
       background: #5acae8;
       color: white;
     }

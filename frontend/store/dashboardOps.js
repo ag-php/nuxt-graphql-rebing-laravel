@@ -5,11 +5,10 @@ export const mutations = {}
 export const actions = {
     
     async getAllSales({ dispatch }, params) {
-
         const client = await dispatch('user/gqlClient', true, { root: true })
         const data = await client.request(`
         query{
-            dashboardOps(
+            dashboardSalesForOps(
                 start: "${params.start}",
                 end: "${params.end}"
             ) {
@@ -17,7 +16,7 @@ export const actions = {
                 type
                 amount
             }
-        }`)
-        return data.dashboardOps
+        }`);
+        return data.dashboardSalesForOps
     },
 }

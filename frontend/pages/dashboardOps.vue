@@ -2,65 +2,72 @@
   <div>
     <h1>Ops Dashboard</h1>
     <br />
-    <el-row type="flex" class="row-bg" justify="center">
-      <el-col :span="5" v-for="(topBox, i) in topBoxes" :key="i">
-        <box-with-title-box :boxTheme="topBox.boxTheme">
-          <template v-slot:header>
-            <span>{{topBox.titleText}}</span>
-          </template>
-          <template v-slot:content>
-            <div v-if="i==0">
-              <el-date-picker
-                v-model="value2"
-                type="daterange"
-                align="right"
-                size="mini"
-                unlink-panels
-                start-placeholder="Start"
-                format="MM/dd/yyyy"
-                end-placeholder="End"
-                :clearable="false"
-                :picker-options="pickerOptions"
-              ></el-date-picker>
-            </div>
-            <span v-if="i != 0">{{topBox.contentText}}</span>
-          </template>
-        </box-with-title-box>
-      </el-col>
-    </el-row>
-    <el-row type="flex" class="row-bg" justify="center">
-      <el-col :span="3">
-        <box-with-header-and-footer boxTheme="blue"></box-with-header-and-footer>
-      </el-col>
-      <el-col :span="2">
-        <bar-h barTheme="blue-black"></bar-h>
-      </el-col>
+    <div class="top-container">
+      <el-row type="flex" class="row-bg top-container" justify="center" style="padding-top: 20px;">
+        <el-col :span="5" v-for="(topBox, i) in topBoxes" :key="i">
+          <box-with-title-box :boxTheme="topBox.boxTheme">
+            <template v-slot:header>
+              <span>{{topBox.titleText}}</span>
+            </template>
+            <template v-slot:content>
+              <div v-if="i==0">
+                <el-date-picker
+                  v-model="dateRange"
+                  type="daterange"
+                  align="right"
+                  size="mini"
+                  unlink-panels
+                  start-placeholder="Start"
+                  format="MM/dd/yyyy"
+                  end-placeholder="End"
+                  :clearable="false"
+                  :picker-options="pickerOptions"
+                ></el-date-picker>
+              </div>
+              <span v-if="i != 0">${{ topBox.contentText }}</span>
+            </template>
+          </box-with-title-box>
+        </el-col>
+      </el-row>
+      <el-row
+        type="flex"
+        class="row-bg top-container"
+        justify="center"
+        style="padding-bottom: 20px;"
+      >
+        <el-col :span="3">
+          <box-with-header-and-footer boxTheme="blue" :salesData="foodbev" title="FOOD"></box-with-header-and-footer>
+        </el-col>
+        <el-col :span="2">
+          <bar-h barTheme="blue-black"></bar-h>
+        </el-col>
 
-      <el-col :span="3">
-        <box-with-header-and-footer boxTheme="black"></box-with-header-and-footer>
-      </el-col>
-      <el-col :span="2">
-        <bar-h barTheme="black-blue"></bar-h>
-      </el-col>
+        <el-col :span="3">
+          <box-with-header-and-footer boxTheme="white" :salesData="beer" title="BEER"></box-with-header-and-footer>
+        </el-col>
+        <el-col :span="2">
+          <bar-h barTheme="black-blue"></bar-h>
+        </el-col>
 
-      <el-col :span="3">
-        <box-with-header-and-footer boxTheme="blue"></box-with-header-and-footer>
-      </el-col>
-      <el-col :span="2">
-        <bar-h barTheme="blue-black"></bar-h>
-      </el-col>
+        <el-col :span="3">
+          <box-with-header-and-footer boxTheme="blue" :salesData="liquor" title="LIQUOR"></box-with-header-and-footer>
+        </el-col>
+        <el-col :span="2">
+          <bar-h barTheme="blue-black"></bar-h>
+        </el-col>
 
-      <el-col :span="3">
-        <box-with-header-and-footer boxTheme="black"></box-with-header-and-footer>
-      </el-col>
-      <el-col :span="2">
-        <bar-h barTheme="black-green"></bar-h>
-      </el-col>
+        <el-col :span="3">
+          <box-with-header-and-footer boxTheme="white" :salesData="wine" title="WINE"></box-with-header-and-footer>
+        </el-col>
+        <el-col :span="2">
+          <bar-h barTheme="black-green"></bar-h>
+        </el-col>
 
-      <el-col :span="3">
-        <box-with-header-and-footer boxTheme="green"></box-with-header-and-footer>
-      </el-col>
-    </el-row>
+        <el-col :span="3">
+          <box-with-header-and-footer boxTheme="green"></box-with-header-and-footer>
+        </el-col>
+      </el-row>
+    </div>
 
     <el-row type="flex" :gutter="20" class="row-bg" justify="center">
       <el-col :span="7">
@@ -161,6 +168,11 @@
 </template>
 
 <script>
+import {
+  convertCurrencySales,
+  getCurrentWeekDays,
+  getLastYearDays
+} from "@/utils";
 import BoxWithTitleBox from "@/components/BoxWithTitleBox";
 import BoxWithHeaderAndFooter from "@/components/BoxWithHeaderAndFooter";
 import BarH from "@/components/BarH";
@@ -177,36 +189,70 @@ export default {
     BarH,
     BoxWithBorder
   },
-  async mounted() {
-    let init = await this.$store.dispatch("graphs/periodReverse", new Date());
-    this.currentPeriod = init;
-    this.periodNum = init;
-
-    this.period = await this.$store.dispatch("graphs/period", this.periodNum);
-    this.month = new Date("01 " + this.period.month + " " + this.period.year);
-  },
   data() {
     return {
-      currentPeriod: 1,
-      periodNum: 1,
-      period: null,
-      month: null,
-      // datePickerOptions: {
-      //   disabledDate(date) {
-      //     return date > new Date() || date < new Date("01/01/2018");
-      //   }
-      // },
+      foodbev: {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      beer: {
+        sales_actual: null,
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+
+      liquor: {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      wine: {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      apparel: {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      totalSales: null,
+      lastYearSales: null,
       pickerOptions: {
         shortcuts: [
           {
             text: "Last week",
             onClick(picker) {
-              let curr = new Date(); // get current date
-              let first = curr.getDate() - curr.getDay() - 6; // First day is the day of the month - the day of the week
-              let last = first + 6; // last day is the first day + 6
+              let d = new Date();
 
-              let firstday = new Date(curr.setDate(first)).toUTCString();
-              let lastday = new Date(curr.setDate(last)).toUTCString();
+              let day = d.getDay();
+              let firstday = new Date(
+                d.getFullYear(),
+                d.getMonth(),
+                d.getDate() + (day == 0 ? -6 : 1) - day - 7
+              );
+              let lastday = new Date(
+                d.getFullYear(),
+                d.getMonth(),
+                d.getDate() + (day == 0 ? 0 : 7) - day - 7
+              );
 
               picker.$emit("pick", [firstday, lastday]);
             }
@@ -214,41 +260,32 @@ export default {
           {
             text: "Last month",
             onClick(picker) {
-              // const end = new Date();
-              // const start = new Date();
-              // start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              // picker.$emit("pick", [start, end]);
               let curr = new Date();
               let month = curr.getMonth();
               let year = curr.getFullYear();
 
-              let firstDay = new Date(year, month -1 , 1);
-              let lastDay = new Date(year, month , 0);
+              let firstDay = new Date(year, month - 1, 1);
+              let lastDay = new Date(year, month, 0);
 
               picker.$emit("pick", [firstDay, lastDay]);
-
             }
           },
           {
             text: "Last 3 months",
             onClick(picker) {
-              // const end = new Date();
-              // const start = new Date();
-              // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              // picker.$emit("pick", [start, end]);
               let curr = new Date();
               let month = curr.getMonth();
               let year = curr.getFullYear();
 
-              let firstDay = new Date(year, month - 3 , 1);
-              let lastDay = new Date(year, month , 0);
+              let firstDay = new Date(year, month - 3, 1);
+              let lastDay = new Date(year, month, 0);
 
               picker.$emit("pick", [firstDay, lastDay]);
             }
           }
         ]
       },
-      value2: "",
+      dateRange: "",
       months: [
         "Jan",
         "Feb",
@@ -273,19 +310,13 @@ export default {
         {
           id: 2,
           titleText: "SALES",
-          contentText: "$258,613",
+          contentText: this.totalSales,
           boxTheme: "green-blue"
         },
         {
           id: 3,
-          titleText: "GOAL",
-          contentText: "$313,787",
-          boxTheme: "green-blue"
-        },
-        {
-          id: 4,
           titleText: "LAST YEAR SALES",
-          contentText: "$303,402",
+          contentText: this.totalSales,
           boxTheme: "green-blue"
         }
       ],
@@ -357,18 +388,90 @@ export default {
     };
   },
   computed: {},
-  methods: {
-    async getPeriodNum() {
-      this.periodNum = await this.$store.dispatch(
-        "graphs/periodReverse",
-        this.month
-      );
+  watch: {
+    dateRange: async function(newValue) {
+      let start = new Date(newValue[0]).toISOString().slice(0, 10);
+      let end = new Date(newValue[1]).toISOString().slice(0, 10);
+      this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
+        start: start,
+        end: end
+      });
+    },
+
+    allSales: {
+      handler(val) {
+        val.map(sales => {
+          if (sales.item.startsWith("foodbev")) {
+            this.foodbev[`${sales.item.slice(7)}_${sales.type}`] = sales.amount;
+          } else if (sales.item.startsWith("beer")) {
+            this.beer[`${sales.item.slice(4)}_${sales.type}`] = sales.amount;
+          } else if (sales.item.startsWith("liquor")) {
+            this.liquor[`${sales.item.slice(6)}_${sales.type}`] = sales.amount;
+          } else if (sales.item.startsWith("wine")) {
+            this.wine[`${sales.item.slice(4)}_${sales.type}`] = sales.amount;
+          } else if (sales.item.startsWith("apparel")) {
+            this.apparel[`${sales.item.slice(4)}_${sales.type}`] = sales.amount;
+          }
+        });
+
+        this.totalSales =
+          this.foodbev.sales_actual +
+          this.beer.sales_actual +
+          this.liquor.sales_actual +
+          this.wine.sales_actual +
+          this.apparel.sales_actual;
+      },
+      deep: true
+    },
+
+    totalSales: function(newValue) {
+      console.log("totalsales changed", newValue);
+      this.topBoxes[1].contentText = convertCurrencySales(newValue);
+    },
+
+    lastYearSales: function(newValue) {
+      this.topBoxes[2].contentText = convertCurrencySales(newValue);
     }
   },
+  methods: {},
   async mounted() {
-    this.allSales = await this.$store.dispatch('dashboardOps/getAllSales', {start: "2019-01-01", end: "2020-01-30"})
+    this.totalSales = "0";
+    this.lastYearSales = "0";
+    this.dateRange = getCurrentWeekDays();
+    let lastYearDateRange = getLastYearDays();
+    let lastYearSalesData = await this.$store.dispatch(
+      "dashboardOps/getAllSales",
+      {
+        start: lastYearDateRange[0],
+        end: lastYearDateRange[1]
+      }
+    );
+
+    this.lastYearSales = lastYearSalesData.reduce((sum, sales) => {
+        if (
+          sales.type === "actual" &&
+          [
+            "beersales",
+            "liquorsales",
+            "foodbevsales",
+            "winesales",
+            "apparelsales"
+          ].indexOf(sales.item) > -1
+        ) {
+          return sum + sales.amount;
+        } else return sum;
+      }, 0);
   }
 };
+
+// let SalesType = {
+//   sales_actual: null,
+//   sales_target: null,
+//   purchase_actual: null,
+//   purchase_target: null,
+//   cgs_actual: null,
+//   cgs_target: null
+// }
 </script>
 
 <style scoped lang="scss">
@@ -385,13 +488,18 @@ export default {
 .row-bg {
   padding: 10px 0;
 }
+
+.top-container {
+  background: #0b263d;
+}
+
 .el-date-editor {
   width: 100%;
   color: white;
   &.el-input__inner {
     border: none !important;
     background: transparent !important;
-    padding: 3px 8px !important;
+    padding: 3px 12px !important;
   }
   /deep/ {
     .el-range__icon {
