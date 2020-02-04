@@ -51,7 +51,7 @@ export default {
     font-size: 18px;
     font-weight: 600;
     &.shorter-header {
-      width: 80%;
+      width: 70%;
     }
   }
   .content {

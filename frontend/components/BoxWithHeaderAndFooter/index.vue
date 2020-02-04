@@ -6,35 +6,35 @@
     <div class="content">
       <div style="width: 100%;">
         <el-row>
-          <el-col :span="12" style="text-align: right;">
+          <el-col :span="14" style="text-align: right;">
             <p>Sales :</p>
           </el-col>
-          <el-col :span="12" style="text-align: left;">
-            <p> ${{sales}}</p>
+          <el-col :span="10" style="text-align: left;">
+            <p>${{sales}}</p>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" style="text-align: right;">
+          <el-col :span="14" style="text-align: right;">
             <p>CGS Target :</p>
           </el-col>
-          <el-col :span="12" style="text-align: left;">
-            <p> ${{cgsTarget}}</p>
+          <el-col :span="10" style="text-align: left;">
+            <p>${{cgsTarget}}</p>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" style="text-align: right;">
+          <el-col :span="14" style="text-align: right;">
             <p>Purchases :</p>
           </el-col>
-          <el-col :span="12" style="text-align: left;">
-            <p> ${{purchase}}</p>
+          <el-col :span="10" style="text-align: left;">
+            <p>${{purchase}}</p>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" style="text-align: right;">
+          <el-col :span="14" style="text-align: right;">
             <p>To Spend :</p>
           </el-col>
-          <el-col :span="12" style="text-align: left;">
-            <p> {{Number(toSpend) >= 0 ? '$' + Number(toSpend) : '-$' + Math.abs(Number(toSpend))}}</p>
+          <el-col :span="10" style="text-align: left;">
+            <p>{{Number(toSpend) >= 0 ? '$' + Number(toSpend) : '-$' + Math.abs(Number(toSpend))}}</p>
           </el-col>
         </el-row>
       </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { convertCurrencySales } from '@/utils'
+import { convertCurrencySales } from "@/utils";
 
 export default {
   name: "BoxWithHeaderAndFooter",
@@ -113,7 +113,7 @@ export default {
   },
   methods: {
     convertCurrencySales(data) {
-      return data? Math.round(data).toLocaleString("en-GB"): 0;
+      return data ? Math.round(data).toLocaleString("en-GB") : 0;
     }
   }
 };
@@ -126,6 +126,10 @@ export default {
 
   font-size: 12px;
   font-weight: 600;
+  // @media (max-width: 976px) {
+  //   font-size: 10px;
+  //   font-weight: 600;
+  // }
 
   display: flex;
   flex-direction: column;
@@ -142,12 +146,21 @@ export default {
   }
   .content {
     width: 95%;
-    min-height: 50%;
-    height: 50%;
     background: white;
+    padding: 10px 0px;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    @media (max-width: 1330px) {
+      font-size: 0.85vw;
+      font-weight: 600;
+    }
+    @media (max-width: 976px) {
+      font-size: 10px;
+      font-weight: 600;
+    }
   }
   .footer {
     width: 100%;

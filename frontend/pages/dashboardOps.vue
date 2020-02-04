@@ -69,24 +69,49 @@
       </el-row>
     </div>
 
-    <el-row type="flex" :gutter="20" class="row-bg" justify="center">
-      <el-col :span="7">
-        <box-with-border>
-          <template v-slot:header>
-            <span>SALES</span>
-          </template>
-          <template v-slot:content>
-            <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="category" label width="64"></el-table-column>
-              <el-table-column prop="goal" label="GOAL"></el-table-column>
-              <el-table-column prop="actual" label="ACTUAL"></el-table-column>
-              <el-table-column prop="percentageOfGoal" label="% of GOAL"></el-table-column>
-            </el-table>
-          </template>
-        </box-with-border>
+    <el-row type="flex" :gutter="5" class="row-bg" justify="center">
+      <el-col :span="8">
+        <el-row type="flex" :gutter="5" justify="center">
+          <el-col :span="8">
+            <el-select v-model="location" placeholder="Locations" @change="locationChanged" style="margin-top: 48px;">
+                <el-option label="Roll Up" value=""></el-option>
+                <el-option
+                v-for="item in locations"
+                :key="item"
+                :label="item.replace(/[^a-z0-9+]+/gi, ' ')"
+                :value="item"
+                >
+                </el-option>
+            </el-select>
+
+            <el-date-picker
+                v-model="month"
+                type="month"
+                placeholder="Pick a month"
+                :picker-options="datePickerOptions"
+                style="margin-top: 6px;"
+                @change="periodChanged">
+            </el-date-picker>
+          </el-col>
+          <el-col :span="16">
+            <box-with-border>
+              <template v-slot:header>
+                <span>SALES</span>
+              </template>
+              <template v-slot:content>
+                <el-table :data="tableData" style="width: 100%">
+                  <el-table-column prop="category" label :min-width="20"></el-table-column>
+                  <el-table-column prop="goal" label="GOAL" :min-width="26.66"></el-table-column>
+                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66"></el-table-column>
+                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66"></el-table-column>
+                </el-table>
+              </template>
+            </box-with-border>
+          </el-col>
+        </el-row>
       </el-col>
 
-      <el-col :span="9">
+      <el-col :span="8">
         <box-with-border :hasBorderForContent="false">
           <template v-slot:header>
             <span>LABOR 32.87%</span>
@@ -135,20 +160,25 @@
         </box-with-border>
       </el-col>
 
-      <el-col :span="7">
-        <box-with-border>
-          <template v-slot:header>
-            <span>DIRECT OF. EXAMPLES</span>
-          </template>
-          <template v-slot:content>
-            <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="category" label width="64"></el-table-column>
-              <el-table-column prop="goal" label="GOAL"></el-table-column>
-              <el-table-column prop="actual" label="ACTUAL"></el-table-column>
-              <el-table-column prop="percentageOfGoal" label="% of GOAL"></el-table-column>
-            </el-table>
-          </template>
-        </box-with-border>
+      <el-col :span="8">
+        <el-row type="flex" justify="center">
+          <el-col :span="16">
+            <box-with-border>
+              <template v-slot:header>
+                <span>DIRECT OF. EXAMPLES</span>
+              </template>
+              <template v-slot:content>
+                <el-table :data="tableData" style="width: 100%">
+                  <el-table-column prop="category" label :min-width="20"></el-table-column>
+                  <el-table-column prop="goal" label="GOAL" :min-width="26.66"></el-table-column>
+                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66"></el-table-column>
+                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66"></el-table-column>
+                </el-table>
+              </template>
+            </box-with-border>
+          </el-col>
+          <el-col :span="8"></el-col>
+        </el-row>
       </el-col>
     </el-row>
 
@@ -392,10 +422,22 @@ export default {
     dateRange: async function(newValue) {
       let start = new Date(newValue[0]).toISOString().slice(0, 10);
       let end = new Date(newValue[1]).toISOString().slice(0, 10);
-      this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
-        start: start,
-        end: end
-      });
+
+      let startForLastYear = new Date(
+        new Date(start).setFullYear(new Date(start).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
+      let endForLastYear = new Date(
+        new Date(end).setFullYear(new Date(end).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
+
+      return Promise.all([
+        this.calculateAllSales(start, end),
+        this.calculatePriorYearSales(startForLastYear, endForLastYear)
+      ]);
     },
 
     allSales: {
@@ -425,7 +467,6 @@ export default {
     },
 
     totalSales: function(newValue) {
-      console.log("totalsales changed", newValue);
       this.topBoxes[1].contentText = convertCurrencySales(newValue);
     },
 
@@ -433,21 +474,23 @@ export default {
       this.topBoxes[2].contentText = convertCurrencySales(newValue);
     }
   },
-  methods: {},
-  async mounted() {
-    this.totalSales = "0";
-    this.lastYearSales = "0";
-    this.dateRange = getCurrentWeekDays();
-    let lastYearDateRange = getLastYearDays();
-    let lastYearSalesData = await this.$store.dispatch(
-      "dashboardOps/getAllSales",
-      {
-        start: lastYearDateRange[0],
-        end: lastYearDateRange[1]
-      }
-    );
+  methods: {
+    async calculateAllSales(start, end) {
+      this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
+        start: start,
+        end: end
+      });
+    },
+    async calculatePriorYearSales(start, end) {
+      let lastYearSalesData = await this.$store.dispatch(
+        "dashboardOps/getAllSales",
+        {
+          start: start,
+          end: end
+        }
+      );
 
-    this.lastYearSales = lastYearSalesData.reduce((sum, sales) => {
+      this.lastYearSales = lastYearSalesData.reduce((sum, sales) => {
         if (
           sales.type === "actual" &&
           [
@@ -461,6 +504,12 @@ export default {
           return sum + sales.amount;
         } else return sum;
       }, 0);
+    }
+  },
+  async mounted() {
+    this.totalSales = "0";
+    this.lastYearSales = "0";
+    this.dateRange = getCurrentWeekDays();
   }
 };
 
