@@ -17,15 +17,15 @@ class DashboardSalesForOpsType extends GraphQLType
         return [
             'item' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'The name of the route',
+                'description' => 'The name of the item',
             ],
             'type' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'URI path of route',
+                'description' => 'The type of the item',
             ],
             'amount' => [
                 'type' => Type::float(),
-                'description' => 'Icon for path',
+                'description' => 'amount for the item',
             ],
         ];
     }

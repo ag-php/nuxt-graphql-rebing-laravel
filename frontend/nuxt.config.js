@@ -2,6 +2,9 @@
 require('dotenv').config();
 
 module.exports = {
+  server: {
+    port: 3333, // default: 3000
+  },
   mode: 'universal',
   env: {
     gqlEndpoint: process.env.GQL_ENDPOINT || 'http://127.0.0.1:8000/graphql'

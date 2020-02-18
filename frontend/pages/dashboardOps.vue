@@ -73,25 +73,40 @@
       <el-col :span="8">
         <el-row type="flex" :gutter="5" justify="center">
           <el-col :span="8">
-            <el-select v-model="location" placeholder="Locations" @change="locationChanged" style="margin-top: 48px;">
-                <el-option label="Roll Up" value=""></el-option>
-                <el-option
+            <el-select
+              v-model="location"
+              placeholder="Locations"
+              @change="locationChanged"
+              style="margin-top: 48px;"
+              class="with-border"
+            >
+              <el-option label="Roll Up" value></el-option>
+              <el-option
                 v-for="item in locations"
                 :key="item"
                 :label="item.replace(/[^a-z0-9+]+/gi, ' ')"
                 :value="item"
-                >
-                </el-option>
+              ></el-option>
             </el-select>
 
             <el-date-picker
-                v-model="month"
-                type="month"
-                placeholder="Pick a month"
-                :picker-options="datePickerOptions"
-                style="margin-top: 6px;"
-                @change="periodChanged">
-            </el-date-picker>
+              v-model="month"
+              type="month"
+              placeholder="Pick a month"
+              :picker-options="datePickerOptions"
+              style="margin-top: 6px;"
+              @change="periodChanged"
+              class="with-border blue-box"
+            ></el-date-picker>
+
+            <el-select
+              v-model="targetSelector"
+              @change="targetSelectorChanged"
+              style="margin-top: 6px;"
+              class="with-border blue-box"
+            >
+              <el-option v-for="item in selectorOptions" :key="item" :label="item" :value="item"></el-option>
+            </el-select>
           </el-col>
           <el-col :span="16">
             <box-with-border>
@@ -99,11 +114,24 @@
                 <span>SALES</span>
               </template>
               <template v-slot:content>
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="totalSalesTable" style="width: 100%" height="300" max-height="300">
                   <el-table-column prop="category" label :min-width="20"></el-table-column>
-                  <el-table-column prop="goal" label="GOAL" :min-width="26.66"></el-table-column>
-                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66"></el-table-column>
-                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66"></el-table-column>
+                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66">
+                    <template slot-scope="scope">
+                      <span>${{ convertCurrencySales(scope.row.actual) }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="goal" label="GOAL" :min-width="26.66">
+                    <template slot-scope="scope">
+                      <span>{{  scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                    </template>
+                  </el-table-column>
+
+                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66">
+                    <template slot-scope="scope">
+                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
+                    </template>
+                  </el-table-column>
                 </el-table>
               </template>
             </box-with-border>
@@ -168,11 +196,23 @@
                 <span>DIRECT OF. EXAMPLES</span>
               </template>
               <template v-slot:content>
-                <el-table :data="tableData" style="width: 100%">
-                  <el-table-column prop="category" label :min-width="20"></el-table-column>
-                  <el-table-column prop="goal" label="GOAL" :min-width="26.66"></el-table-column>
-                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66"></el-table-column>
-                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66"></el-table-column>
+                <el-table :data="opexTable" style="width: 100%" height="300px">
+                  <el-table-column prop="category" label :min-width="34"></el-table-column>
+                  <el-table-column prop="actual" label="$" :min-width="22">
+                    <template slot-scope="scope">
+                      <span>${{ convertCurrencySales(scope.row.actual) }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="percentageOfGoal" label="%" :min-width="22">
+                    <template slot-scope="scope">
+                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="goal" label="GOAL" :min-width="22">
+                    <template slot-scope="scope">
+                      <span>{{  scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                    </template>
+                  </el-table-column>
                 </el-table>
               </template>
             </box-with-border>
@@ -221,6 +261,19 @@ export default {
   },
   data() {
     return {
+      currentPeriod: 1,
+      periodNum: 1,
+      period: null,
+      month: null,
+      location: null,
+      locations: [],
+      datePickerOptions: {
+        disabledDate(date) {
+          return date > new Date() || date < new Date("01/01/2018");
+        }
+      },
+      selectorOptions: ["Budget", "Q2 Forecast", "Q3 Forecast", "Q4 Forecast"],
+      targetSelector: "Budget",
       foodbev: {
         sales_actual: null,
         sales_target: null,
@@ -316,20 +369,6 @@ export default {
         ]
       },
       dateRange: "",
-      months: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
       topBoxes: [
         {
           id: 1,
@@ -376,42 +415,74 @@ export default {
           boxTheme: "green-dark-green large-content"
         }
       ],
-      tableData: [
+      totalSalesTable: [
         {
           category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         },
         {
-          category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          category: "Beer",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         },
         {
-          category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          category: "Liquor",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         },
         {
-          category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          category: "Wine",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         },
         {
-          category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          category: "Other",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        }
+      ],
+      opexTable: [
+        {
+          category: "Restaurant Supplies",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         },
         {
-          category: "Food",
-          goal: "217,163",
-          actual: "140,000",
-          percentageOfGoal: "63"
+          category: "Restaurant Expenses",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Facility Expenses",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Administration",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Advertising",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Occupancy",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
         }
       ],
       allSales: []
@@ -475,6 +546,64 @@ export default {
     }
   },
   methods: {
+    convertCurrencySales(value) {
+      return convertCurrencySales(value);
+    },
+    async periodChanged() {
+      this.periodNum = await this.$store.dispatch(
+        "graphs/periodReverse",
+        this.month
+      );
+      this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+      await this.loadSalesForMiddleBoxes();
+    },
+    async locationChanged() {
+      await this.loadSalesForMiddleBoxes();
+    },
+    async targetSelectorChanged() {
+      await this.loadSalesForMiddleBoxes();
+    },
+    async loadSalesForMiddleBoxes() {
+      return Promise.all([this.loadSalesForMonth()]);
+    },
+    async loadSalesForMonth() {
+      let sales = await this.$store.dispatch(
+        "dashboardOps/getSalesForMiddleBoxes",
+        {
+          location: this.location,
+          period: this.periodNum,
+          selector: this.targetSelector
+        }
+      );
+
+      sales.forEach(sale => {
+        if (sale.category === "totalsales") {
+          if (sale.target.toLowerCase() === "actuals") {
+            this.totalSalesTable[sale.rankInCategory - 2].actual = sale.amount;
+          } else;
+          this.totalSalesTable[sale.rankInCategory - 2].goal = sale.amount;
+        } else if (sale.category === "opex") {
+          if (sale.target.toLowerCase() === "actuals") {
+            this.opexTable[sale.rankInCategory - 1].actual = sale.amount;
+          } else
+            this.totalSalesTable[sale.rankInCategory - 1].goal = sale.amount;
+        }
+      });
+      this.totalSalesTable = this.totalSalesTable.map(item => {
+        return {
+          ...item,
+          percentageOfGoal:
+            item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
+        };
+      });
+      this.opexTable = this.totalSalesTable.map(item => {
+        return {
+          ...item,
+          percentageOfGoal:
+            item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
+        };
+      });
+    },
     async calculateAllSales(start, end) {
       this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
         start: start,
@@ -510,6 +639,17 @@ export default {
     this.totalSales = "0";
     this.lastYearSales = "0";
     this.dateRange = getCurrentWeekDays();
+    let init = await this.$store.dispatch("graphs/periodReverse", new Date());
+    this.currentPeriod = init;
+    this.periodNum = init;
+
+    this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+    this.month = new Date("01 " + this.period.month + " " + this.period.year);
+
+    this.locations = await this.$store.dispatch("graphs/locations");
+    this.location = this.locations[0];
+
+    await this.loadSalesForMiddleBoxes();
   }
 };
 
@@ -542,9 +682,54 @@ export default {
   background: #0b263d;
 }
 
+.el-select {
+  width: 100%;
+  color: white;
+  &.with-border {
+    border: 3px solid black;
+    /deep/ .el-input__inner {
+      border-radius: unset !important;
+    }
+  }
+  &.blue-box {
+    /deep/ {
+      .el-input__inner {
+        background: #5acae8 !important;
+        color: white;
+      }
+      .el-input__prefix,
+      .el-input__suffix {
+        .el-input__icon {
+          color: white !important;
+        }
+      }
+    }
+  }
+}
+
 .el-date-editor {
   width: 100%;
   color: white;
+  &.with-border {
+    border: 3px solid black;
+    /deep/ .el-input__inner {
+      border-radius: unset !important;
+    }
+  }
+  &.blue-box {
+    /deep/ {
+      .el-input__inner {
+        background: #5acae8 !important;
+        color: white;
+      }
+      .el-input__prefix,
+      .el-input__suffix {
+        .el-input__icon {
+          color: white !important;
+        }
+      }
+    }
+  }
   &.el-input__inner {
     border: none !important;
     background: transparent !important;

@@ -133,7 +133,7 @@ export async function setContext (app, context) {
       payload: context.payload,
       error: context.error,
       base: '/',
-      env: {"gqlEndpoint":"http://127.0.0.1:8000/graphql","JWT_SECRET":"zMmcleggxQ74t9NnpKyTKRrmv7BvYmMh70mk7UgvZ5kOTIMdWLLGJ2mVSy69TJpk"}
+      env: {"gqlEndpoint":"https://backend.axisplanningandconsulting.com/graphql","JWT_SECRET":"zMmcleggxQ74t9NnpKyTKRrmv7BvYmMh70mk7UgvZ5kOTIMdWLLGJ2mVSy69TJpk","GQL_ENDPOINT":"https://backend.axisplanningandconsulting.com/graphql"}
     }
     // Only set once
     if (context.req) {

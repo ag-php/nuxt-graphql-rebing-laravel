@@ -67,12 +67,24 @@ export default {
     font-size: 8px !important;
     .el-table {
       font-size: 10px !important;
+      /deep/ .el-table__body{
+        height: 100%;
+      }
+      /deep/ td {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        height: 16.66%;
+      }
       /deep/ .cell {
         padding-left: 0px !important;
         padding-right: 0px !important;
         display: flex;
         justify-content: center;
         align-items: center;
+        text-align: center;
+        word-break: normal;
+        
+        
       }
       /deep/ tr {
         th {
@@ -86,11 +98,14 @@ export default {
             font-weight: 900;
           }
         }
+        // td {
+        //   padding: 0px;
+        // }
         th:nth-child(2) {
           background: #5acae8 !important;
         }
         td:first-child {
-          .cell{
+          .cell {
             color: black;
             font-weight: 900;
           }
