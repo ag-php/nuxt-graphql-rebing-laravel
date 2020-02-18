@@ -198,19 +198,19 @@
               <template v-slot:content>
                 <el-table :data="opexTable" style="width: 100%" height="300px">
                   <el-table-column prop="category" label :min-width="34"></el-table-column>
-                  <el-table-column prop="actual" label="$" :min-width="22">
+                  <el-table-column prop="actual" label="Actual" :min-width="22">
                     <template slot-scope="scope">
                       <span>${{ convertCurrencySales(scope.row.actual) }}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="percentageOfGoal" label="%" :min-width="22">
-                    <template slot-scope="scope">
-                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column prop="goal" label="GOAL" :min-width="22">
                     <template slot-scope="scope">
                       <span>{{  scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="22">
+                    <template slot-scope="scope">
+                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -586,7 +586,7 @@ export default {
           if (sale.target.toLowerCase() === "actuals") {
             this.opexTable[sale.rankInCategory - 1].actual = sale.amount;
           } else
-            this.totalSalesTable[sale.rankInCategory - 1].goal = sale.amount;
+            this.opexTable[sale.rankInCategory - 1].goal = sale.amount;
         }
       });
       this.totalSalesTable = this.totalSalesTable.map(item => {
@@ -596,13 +596,16 @@ export default {
             item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
         };
       });
-      this.opexTable = this.totalSalesTable.map(item => {
+      this.opexTable = this.opexTable.map(item => {
         return {
           ...item,
           percentageOfGoal:
             item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
         };
       });
+      console.log(this.totalSalesTable);
+      console.log(this.opexTable);
+
     },
     async calculateAllSales(start, end) {
       this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
