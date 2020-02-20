@@ -567,9 +567,9 @@ export default {
       }
       return roots;
     },
-    rollup(event) {},
-    selectLocation(node) {
+    async selectLocation(node) {
       this.location = node;
+      await this.loadSalesForMiddleBoxes();
     },
     convertCurrencySales(value) {
       return convertCurrencySales(value);
@@ -592,6 +592,7 @@ export default {
       return Promise.all([this.loadSalesForMonth()]);
     },
     async loadSalesForMonth() {
+      this.initMiddleBoxTables();
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
         {
@@ -663,6 +664,78 @@ export default {
           return sum + sales.amount;
         } else return sum;
       }, 0);
+    },
+    initMiddleBoxTables() {
+      this.totalSalesTable = [
+        {
+          category: "Food",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Beer",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Liquor",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Wine",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Other",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        }
+      ];
+      this.opexTable = [
+        {
+          category: "Restaurant Supplies",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Restaurant Expenses",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Facility Expenses",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Administration",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Advertising",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        },
+        {
+          category: "Occupancy",
+          actual: 0,
+          goal: 0,
+          percentageOfGoal: 0
+        }
+      ]
     }
   },
   async mounted() {
@@ -675,6 +748,8 @@ export default {
 
     this.period = await this.$store.dispatch("graphs/period", this.periodNum);
     this.month = new Date("01 " + this.period.month + " " + this.period.year);
+
+    this.initMiddleBoxTables();
 
     this.locations = await this.$store.dispatch("graphs/locations");
 
@@ -693,7 +768,6 @@ export default {
 
     this.location = this.locationEntries[0];
 
-    console.log('location', this.location);
     await this.loadSalesForMiddleBoxes();
   }
 };
