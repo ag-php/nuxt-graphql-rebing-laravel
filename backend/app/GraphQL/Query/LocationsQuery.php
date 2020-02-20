@@ -30,7 +30,7 @@ class LocationsQuery extends AuthenticatedQuery
     {
         $sql = <<<SQL
             SELECT
-            `acct_id`, `acct`, `parent`
+            `acct_id`, `acct`, `parent`, `acct_type`
             FROM
                 (`costcenter_tree`)
 

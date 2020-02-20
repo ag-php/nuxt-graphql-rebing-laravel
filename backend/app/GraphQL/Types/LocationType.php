@@ -27,6 +27,10 @@ class LocationType extends GraphQLType
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'is parent',
             ],
+            'acct_type' => [
+              'type' => Type::nonNull(Type::string()),
+              'acct name' => 'Text description',
+          ],
         ];
     }
 }

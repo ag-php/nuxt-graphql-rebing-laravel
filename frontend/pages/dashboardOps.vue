@@ -73,22 +73,6 @@
       <el-col :span="10">
         <el-row type="flex" :gutter="5" justify="center">
           <el-col :span="10">
-            <!-- <el-select
-              v-model="location"
-              placeholder="Locations"
-              @change="locationChanged"
-              style="margin-top: 48px;"
-              class="with-border"
-            >
-              <el-option label="Roll Up" value></el-option>
-              <el-option
-                v-for="item in locations"
-                :key="item"
-                :label="item.replace(/[^a-z0-9+]+/gi, ' ')"
-                :value="item"
-              ></el-option>
-            </el-select>-->
-
             <el-tree
               :data="locationEntries"
               node-key="id"
@@ -96,13 +80,10 @@
               @node-click="selectLocation"
               class="with-border"
             >
-              <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span class="custom-tree-node" slot-scope="{ node }">
                 <span
-                  :class="{'location-label': node.id == selectedLocation.id}"
+                  v-bind:class="{'location-label': node.label === location.label}"
                 >{{ node.label.replace(/[^a-z0-9+]+/gi, ' ') }}</span>
-                <span v-if="!node.isLeaf">
-                  <el-button size="mini" round @click="() => rollup(data)" type="text">Roll up</el-button>
-                </span>
               </span>
             </el-tree>
 
@@ -278,7 +259,7 @@ export default {
   data() {
     return {
       locationEntries: [],
-      selectedLocation: {
+      location: {
         id: null,
         label: null,
         children: []
@@ -287,7 +268,6 @@ export default {
       periodNum: 1,
       period: null,
       month: null,
-      location: null,
       locations: [],
       datePickerOptions: {
         disabledDate(date) {
@@ -569,19 +549,17 @@ export default {
   },
   methods: {
     convertToTree(list) {
-      console.log("list", list);
       let map = {},
         node,
         roots = [],
         i;
       for (i = 0; i < list.length; i += 1) {
-        map[list[i].id] = i; // initialize the map
-        list[i].children = []; // initialize the children
+        map[list[i].id] = i;
+        list[i].children = [];
       }
       for (i = 0; i < list.length; i += 1) {
         node = list[i];
         if (node.parent !== 0) {
-          // if you have dangling branches check that map[node.parentId] exists
           list[map[node.parent]].children.push(node);
         } else {
           roots.push(node);
@@ -591,9 +569,7 @@ export default {
     },
     rollup(event) {},
     selectLocation(node) {
-      this.selectedLocation = node;
-      console.log("clicked node", node);
-      console.log("this.selectedLoca", this.selectedLocation);
+      this.location = node;
     },
     convertCurrencySales(value) {
       return convertCurrencySales(value);
@@ -619,7 +595,9 @@ export default {
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
         {
-          location: this.location,
+          location: this.location.label,
+          locationId: this.location.id,
+          isParent: this.location.acct_type === "parent",
           period: this.periodNum,
           selector: this.targetSelector
         }
@@ -628,13 +606,13 @@ export default {
       sales.forEach(sale => {
         if (sale.category === "totalsales") {
           if (sale.target.toLowerCase() === "actuals") {
-            this.totalSalesTable[sale.rankInCategory - 2].actual = sale.amount;
+            this.totalSalesTable[sale.rankInCategory - 2].actual += sale.amount;
           } else;
-          this.totalSalesTable[sale.rankInCategory - 2].goal = sale.amount;
+          this.totalSalesTable[sale.rankInCategory - 2].goal += sale.amount;
         } else if (sale.category === "opex") {
           if (sale.target.toLowerCase() === "actuals") {
-            this.opexTable[sale.rankInCategory - 1].actual = sale.amount;
-          } else this.opexTable[sale.rankInCategory - 1].goal = sale.amount;
+            this.opexTable[sale.rankInCategory - 1].actual += sale.amount;
+          } else this.opexTable[sale.rankInCategory - 1].goal += sale.amount;
         }
       });
       this.totalSalesTable = this.totalSalesTable.map(item => {
@@ -688,20 +666,18 @@ export default {
     }
   },
   async mounted() {
-    // this.totalSales = "0";
-    // this.lastYearSales = "0";
-    // this.dateRange = getCurrentWeekDays();
-    // let init = await this.$store.dispatch("graphs/periodReverse", new Date());
-    // this.currentPeriod = init;
-    // this.periodNum = init;
+    this.totalSales = "0";
+    this.lastYearSales = "0";
+    this.dateRange = getCurrentWeekDays();
+    let init = await this.$store.dispatch("graphs/periodReverse", new Date());
+    this.currentPeriod = init;
+    this.periodNum = init;
 
-    // this.period = await this.$store.dispatch("graphs/period", this.periodNum);
-    // this.month = new Date("01 " + this.period.month + " " + this.period.year);
+    this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+    this.month = new Date("01 " + this.period.month + " " + this.period.year);
 
     this.locations = await this.$store.dispatch("graphs/locations");
-    this.location = this.locations[0];
 
-    // await this.loadSalesForMiddleBoxes();
     this.locationEntries = JSON.parse(
       JSON.stringify(
         this.convertToTree(
@@ -714,6 +690,11 @@ export default {
         )
       )
     );
+
+    this.location = this.locationEntries[0];
+
+    console.log('location', this.location);
+    await this.loadSalesForMiddleBoxes();
   }
 };
 
@@ -750,7 +731,7 @@ export default {
   &.with-border {
     border: 3px solid black;
     }
-  }
+
   /deep/ .el-tree-node {
     &.is-current {
       .el-tree-node__content {

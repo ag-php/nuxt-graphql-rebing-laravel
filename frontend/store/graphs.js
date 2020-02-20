@@ -66,6 +66,7 @@ export const actions = {
                 acct_id
                 acct
                 parent
+                acct_type
             }
         }`)
         return data.locations
