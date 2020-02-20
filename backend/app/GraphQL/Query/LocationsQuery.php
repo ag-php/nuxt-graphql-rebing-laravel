@@ -18,7 +18,7 @@ class LocationsQuery extends AuthenticatedQuery
 
     public function type(): Type
     {
-        return Type::listOf(Type::string());
+        return Type::listOf(GraphQL::type('location'));
     }
 
     public function args(): array
@@ -28,14 +28,13 @@ class LocationsQuery extends AuthenticatedQuery
 
     public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
     {
-        $data = DB::connection('tenant')->select("SELECT `acct` FROM `costcenter_tree` WHERE `parent` <> 0;");
+        $sql = <<<SQL
+            SELECT
+            `acct_id`, `acct`, `parent`
+            FROM
+                (`costcenter_tree`)
 
-        $locations = [];
-
-        foreach($data as $r) {
-            $locations[] = $r->acct;
-        }
-
-        return $locations;
+SQL;
+        return DB::connection('tenant')->select($sql);
     }
 }

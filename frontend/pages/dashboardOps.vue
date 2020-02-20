@@ -70,10 +70,10 @@
     </div>
 
     <el-row type="flex" :gutter="5" class="row-bg" justify="center">
-      <el-col :span="8">
+      <el-col :span="10">
         <el-row type="flex" :gutter="5" justify="center">
-          <el-col :span="8">
-            <el-select
+          <el-col :span="10">
+            <!-- <el-select
               v-model="location"
               placeholder="Locations"
               @change="locationChanged"
@@ -87,7 +87,24 @@
                 :label="item.replace(/[^a-z0-9+]+/gi, ' ')"
                 :value="item"
               ></el-option>
-            </el-select>
+            </el-select>-->
+
+            <el-tree
+              :data="locationEntries"
+              node-key="id"
+              :expand-on-click-node="false"
+              @node-click="selectLocation"
+              class="with-border"
+            >
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span
+                  :class="{'location-label': node.id == selectedLocation.id}"
+                >{{ node.label.replace(/[^a-z0-9+]+/gi, ' ') }}</span>
+                <span v-if="!node.isLeaf">
+                  <el-button size="mini" round @click="() => rollup(data)" type="text">Roll up</el-button>
+                </span>
+              </span>
+            </el-tree>
 
             <el-date-picker
               v-model="month"
@@ -108,7 +125,7 @@
               <el-option v-for="item in selectorOptions" :key="item" :label="item" :value="item"></el-option>
             </el-select>
           </el-col>
-          <el-col :span="16">
+          <el-col :span="14">
             <box-with-border>
               <template v-slot:header>
                 <span>SALES</span>
@@ -123,7 +140,7 @@
                   </el-table-column>
                   <el-table-column prop="goal" label="GOAL" :min-width="26.66">
                     <template slot-scope="scope">
-                      <span>{{  scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                      <span>{{ scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
                     </template>
                   </el-table-column>
 
@@ -188,9 +205,9 @@
         </box-with-border>
       </el-col>
 
-      <el-col :span="8">
+      <el-col :span="6">
         <el-row type="flex" justify="center">
-          <el-col :span="16">
+          <el-col :span="24">
             <box-with-border>
               <template v-slot:header>
                 <span>DIRECT OF. EXAMPLES</span>
@@ -205,7 +222,7 @@
                   </el-table-column>
                   <el-table-column prop="goal" label="GOAL" :min-width="22">
                     <template slot-scope="scope">
-                      <span>{{  scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                      <span>{{ scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="22">
@@ -217,7 +234,6 @@
               </template>
             </box-with-border>
           </el-col>
-          <el-col :span="8"></el-col>
         </el-row>
       </el-col>
     </el-row>
@@ -261,6 +277,12 @@ export default {
   },
   data() {
     return {
+      locationEntries: [],
+      selectedLocation: {
+        id: null,
+        label: null,
+        children: []
+      },
       currentPeriod: 1,
       periodNum: 1,
       period: null,
@@ -546,6 +568,33 @@ export default {
     }
   },
   methods: {
+    convertToTree(list) {
+      console.log("list", list);
+      let map = {},
+        node,
+        roots = [],
+        i;
+      for (i = 0; i < list.length; i += 1) {
+        map[list[i].id] = i; // initialize the map
+        list[i].children = []; // initialize the children
+      }
+      for (i = 0; i < list.length; i += 1) {
+        node = list[i];
+        if (node.parent !== 0) {
+          // if you have dangling branches check that map[node.parentId] exists
+          list[map[node.parent]].children.push(node);
+        } else {
+          roots.push(node);
+        }
+      }
+      return roots;
+    },
+    rollup(event) {},
+    selectLocation(node) {
+      this.selectedLocation = node;
+      console.log("clicked node", node);
+      console.log("this.selectedLoca", this.selectedLocation);
+    },
     convertCurrencySales(value) {
       return convertCurrencySales(value);
     },
@@ -585,27 +634,27 @@ export default {
         } else if (sale.category === "opex") {
           if (sale.target.toLowerCase() === "actuals") {
             this.opexTable[sale.rankInCategory - 1].actual = sale.amount;
-          } else
-            this.opexTable[sale.rankInCategory - 1].goal = sale.amount;
+          } else this.opexTable[sale.rankInCategory - 1].goal = sale.amount;
         }
       });
       this.totalSalesTable = this.totalSalesTable.map(item => {
         return {
           ...item,
           percentageOfGoal:
-            item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
+            item.actual !== 0 && item.goal !== 0
+              ? Number(item.actual / item.goal).toFixed(2) * 100
+              : 0
         };
       });
       this.opexTable = this.opexTable.map(item => {
         return {
           ...item,
           percentageOfGoal:
-            item.actual !== 0 && item.goal !== 0 ? Number(item.actual / item.goal).toFixed(2) * 100 : 0
+            item.actual !== 0 && item.goal !== 0
+              ? Number(item.actual / item.goal).toFixed(2) * 100
+              : 0
         };
       });
-      console.log(this.totalSalesTable);
-      console.log(this.opexTable);
-
     },
     async calculateAllSales(start, end) {
       this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
@@ -639,20 +688,32 @@ export default {
     }
   },
   async mounted() {
-    this.totalSales = "0";
-    this.lastYearSales = "0";
-    this.dateRange = getCurrentWeekDays();
-    let init = await this.$store.dispatch("graphs/periodReverse", new Date());
-    this.currentPeriod = init;
-    this.periodNum = init;
+    // this.totalSales = "0";
+    // this.lastYearSales = "0";
+    // this.dateRange = getCurrentWeekDays();
+    // let init = await this.$store.dispatch("graphs/periodReverse", new Date());
+    // this.currentPeriod = init;
+    // this.periodNum = init;
 
-    this.period = await this.$store.dispatch("graphs/period", this.periodNum);
-    this.month = new Date("01 " + this.period.month + " " + this.period.year);
+    // this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+    // this.month = new Date("01 " + this.period.month + " " + this.period.year);
 
     this.locations = await this.$store.dispatch("graphs/locations");
     this.location = this.locations[0];
 
-    await this.loadSalesForMiddleBoxes();
+    // await this.loadSalesForMiddleBoxes();
+    this.locationEntries = JSON.parse(
+      JSON.stringify(
+        this.convertToTree(
+          this.locations.map(item => ({
+            ...item,
+            id: item.acct_id,
+            children: [],
+            label: item.acct
+          }))
+        )
+      )
+    );
   }
 };
 
@@ -683,6 +744,24 @@ export default {
 
 .top-container {
   background: #0b263d;
+}
+
+.el-tree {
+  &.with-border {
+    border: 3px solid black;
+    }
+  }
+  /deep/ .el-tree-node {
+    &.is-current {
+      .el-tree-node__content {
+        .custom-tree-node {
+          .location-label {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
 }
 
 .el-select {

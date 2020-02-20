@@ -147,6 +147,7 @@ return [
         'route' => App\GraphQL\Types\RouteType::class,
         'token' => App\GraphQL\Types\TokenType::class,
         'period' => App\GraphQL\Types\PeriodType::class,
+        'location' => App\GraphQL\Types\LocationType::class,
         'revenue' => App\GraphQL\Types\RevenueType::class,
         'category' => App\GraphQL\Types\CategoryType::class,
         'membership' => App\GraphQL\Types\MembershipType::class,

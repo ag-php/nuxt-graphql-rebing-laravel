@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import { interopDefault } from './utils'
 import scrollBehavior from './router.scrollBehavior.js'
 
+const _2416eb9e = () => interopDefault(import('..\\pages\\boxesAssignment.vue' /* webpackChunkName: "pages_boxesAssignment" */))
 const _e84386c2 = () => interopDefault(import('..\\pages\\dashboard.vue' /* webpackChunkName: "pages_dashboard" */))
 const _1ffdfeba = () => interopDefault(import('..\\pages\\dashboard2.vue' /* webpackChunkName: "pages_dashboard2" */))
 const _622db4c3 = () => interopDefault(import('..\\pages\\dashboardOps.vue' /* webpackChunkName: "pages_dashboardOps" */))
@@ -33,6 +34,10 @@ export const routerOptions = {
   scrollBehavior,
 
   routes: [{
+    path: "/boxesAssignment",
+    component: _2416eb9e,
+    name: "boxesAssignment"
+  }, {
     path: "/dashboard",
     component: _e84386c2,
     name: "dashboard"

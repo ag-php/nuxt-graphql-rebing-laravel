@@ -62,7 +62,11 @@ export const actions = {
         const client = await dispatch('user/gqlClient', true, { root: true })
         const data = await client.request(`
         query {
-            locations
+            locations {
+                acct_id
+                acct
+                parent
+            }
         }`)
         return data.locations
     },
