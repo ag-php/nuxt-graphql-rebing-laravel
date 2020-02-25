@@ -3,8 +3,8 @@
     <h1>Ops Dashboard</h1>
     <br />
     <div class="top-container">
-      <el-row type="flex" class="row-bg top-container" justify="center" style="padding-top: 20px;">
-        <el-col :span="5" v-for="(topBox, i) in topBoxes" :key="i">
+      <el-row class="row-bg top-container" justify="center" style="padding-top: 20px;">
+        <el-col :sm="24" :md="8" v-for="(topBox, i) in topBoxes" :key="i" v-bind:class="{ 'mb-4': $device.isMobile}">
           <box-with-title-box :boxTheme="topBox.boxTheme">
             <template v-slot:header>
               <span>{{topBox.titleText}}</span>
@@ -30,49 +30,48 @@
         </el-col>
       </el-row>
       <el-row
-        type="flex"
         class="row-bg top-container"
         justify="center"
         style="padding-bottom: 20px;"
       >
-        <el-col :span="3">
+        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
           <box-with-header-and-footer boxTheme="blue" :salesData="foodbev" title="FOOD"></box-with-header-and-footer>
         </el-col>
-        <el-col :span="2">
+        <el-col v-if="!$device.isMobile" :sm="2" :md="2">
           <bar-h barTheme="blue-black"></bar-h>
         </el-col>
 
-        <el-col :span="3">
+        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
           <box-with-header-and-footer boxTheme="white" :salesData="beer" title="BEER"></box-with-header-and-footer>
         </el-col>
-        <el-col :span="2">
+        <el-col v-if="$device.isDesktop" :md="2">
           <bar-h barTheme="black-blue"></bar-h>
         </el-col>
 
-        <el-col :span="3">
+        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
           <box-with-header-and-footer boxTheme="blue" :salesData="liquor" title="LIQUOR"></box-with-header-and-footer>
         </el-col>
-        <el-col :span="2">
+        <el-col v-if="!$device.isMobile" :md="2">
           <bar-h barTheme="blue-black"></bar-h>
         </el-col>
 
-        <el-col :span="3">
+        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
           <box-with-header-and-footer boxTheme="white" :salesData="wine" title="WINE"></box-with-header-and-footer>
         </el-col>
-        <el-col :span="2">
+        <el-col v-if="$device.isDesktop" :md="2">
           <bar-h barTheme="black-green"></bar-h>
         </el-col>
 
-        <el-col :span="3">
+        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
           <box-with-header-and-footer boxTheme="green"></box-with-header-and-footer>
         </el-col>
       </el-row>
     </div>
 
-    <el-row type="flex" :gutter="5" class="row-bg" justify="center">
-      <el-col :span="10">
-        <el-row type="flex" :gutter="5" justify="center">
-          <el-col :span="10">
+    <el-row :gutter="5" class="row-bg" justify="center">
+      <el-col :sm="24" :md="12" :lg="10" v-bind:class="{ 'mb-4': $device.isMobile}">
+        <el-row :gutter="5" justify="center">
+          <el-col :sm="24" :md="10" v-bind:class="{ 'mb-4': $device.isMobile}">
             <el-tree
               :data="locationEntries"
               node-key="id"
@@ -106,7 +105,7 @@
               <el-option v-for="item in selectorOptions" :key="item" :label="item" :value="item"></el-option>
             </el-select>
           </el-col>
-          <el-col :span="14">
+          <el-col :sm="24" :md="14">
             <box-with-border>
               <template v-slot:header>
                 <span>SALES</span>
@@ -137,7 +136,7 @@
         </el-row>
       </el-col>
 
-      <el-col :span="8">
+      <el-col :sm="24" :md="12" :lg="8">
         <box-with-border :hasBorderForContent="false">
           <template v-slot:header>
             <span>LABOR 32.87%</span>
@@ -186,7 +185,7 @@
         </box-with-border>
       </el-col>
 
-      <el-col :span="6">
+      <el-col :sm="24" :md="12" :lg="6">
         <el-row type="flex" justify="center">
           <el-col :span="24">
             <box-with-border>
@@ -219,8 +218,8 @@
       </el-col>
     </el-row>
 
-    <el-row type="flex" class="row-bg" justify="center">
-      <el-col :span="5" v-for="(bottomBox, i) in bottomBoxes" :key="i">
+    <el-row class="row-bg" justify="center">
+      <el-col :sm="24" :md="8" v-bind:class="{ 'mb-4': $device.isMobile}" v-for="(bottomBox, i) in bottomBoxes" :key="i">
         <box-with-title-box :boxTheme="bottomBox.boxTheme">
           <template v-slot:header>
             <span>{{bottomBox.titleText}}</span>
@@ -783,6 +782,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.mx-4 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.mb-4{
+  margin-bottom: 16px;
+}
 .el-row {
   margin-bottom: 20px;
   &:last-child {

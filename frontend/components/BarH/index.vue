@@ -23,6 +23,8 @@ export default {
 <style lang="scss" scoped>
 .board-column {
   height: 100%;
+  min-height: 160px;
+  height: 160px;
   display: flex;
   justify-content: center;
   align-items: center;
