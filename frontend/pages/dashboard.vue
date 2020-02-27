@@ -438,7 +438,7 @@ export default {
     },
 
     async locationChanged(node) {
-      if (node.acct_type == "parent") {
+      if (node.acct_type == "child") {
         this.location = node;
         await this.loadGraphs();
       }
