@@ -3,15 +3,24 @@
     <h1>Dashboard</h1>
     <br />
     <div>
-      <el-select v-model="location" placeholder="Locations" @change="locationChanged">
-        <el-option label="Roll Up" value></el-option>
-        <el-option
-          v-for="item in locations"
-          :key="item"
-          :label="item.replace(/[^a-z0-9+]+/gi, ' ')"
-          :value="item"
-        ></el-option>
-      </el-select>
+      <el-row>
+        <el-tree
+          :data="locationEntries"
+          node-key="id"
+          :expand-on-click-node="false"
+          @node-click="locationChanged"
+          class="with-border"
+          default-expand-all
+        >
+          <span class="custom-tree-node" slot-scope="{ node }">
+            <span
+              v-bind:class="{
+                'location-label': node.label === location.label
+              }"
+              >{{ node.label.replace(/[^a-z0-9+]+/gi, " ") }}</span
+            >
+          </span>
+        </el-tree>
 
       <el-date-picker
         v-model="month"
@@ -20,6 +29,8 @@
         :picker-options="datePickerOptions"
         @change="getPeriodNum"
       ></el-date-picker>
+      </el-row>
+      
 
       <!-- <table class="rev-table">
                 <tr>
@@ -117,7 +128,21 @@ export default {
     this.month = new Date("01 " + this.period.month + " " + this.period.year);
 
     this.locations = await this.$store.dispatch("graphs/locations");
-    this.location = this.locations[0];
+
+    this.locationEntries = JSON.parse(
+      JSON.stringify(
+        this.convertToTree(
+          this.locations.map(item => ({
+            ...item,
+            id: item.acct_id,
+            children: [],
+            label: item.acct
+          }))
+        )
+      )
+    );
+
+    this.location = this.locationEntries[0].children[0];
 
     await this.loadGraphs();
   },
@@ -132,13 +157,16 @@ export default {
           return date > new Date() || date < new Date("01/01/2018");
         }
       },
-      location: null,
+      locationEntries: [],
+      location: {
+        id: null,
+        label: null,
+        children: []
+      },
       locations: [],
-
       g1loaded: false,
       g2loaded: false,
       g5loaded: false,
-
       actualsCYCOGS: [],
       actualsLYCOGS: [],
       targetCOGS: [],
@@ -403,8 +431,30 @@ export default {
     }
   },
   methods: {
-    async locationChanged() {
-      await this.loadGraphs();
+    convertToTree(list) {
+      let map = {},
+        node,
+        roots = [],
+        i;
+      for (i = 0; i < list.length; i += 1) {
+        map[list[i].id] = i;
+        list[i].children = [];
+      }
+      for (i = 0; i < list.length; i += 1) {
+        node = list[i];
+        if (node.parent !== 0) {
+          list[map[node.parent]].children.push(node);
+        } else {
+          roots.push(node);
+        }
+      }
+      return roots;
+    },
+    async locationChanged(node) {
+      if (node.acct_type == "parent") {
+        this.location = node;
+        await this.loadGraphs();
+      }
     },
     async loadGraphs() {
       return Promise.all([
@@ -416,7 +466,7 @@ export default {
     async loadGraph1() {
       this.g1loaded = false;
       let g1dataA = await this.$store.dispatch("graphs/graphOne", {
-        location: this.location,
+        location: this.location.label,
         period: this.periodNum
       });
       this.revenueCY = [];
@@ -430,7 +480,7 @@ export default {
       );
 
       let g1dataB = await this.$store.dispatch("graphs/graphOne", {
-        location: this.location,
+        location: this.location.label,
         period: this.periodNum - 12
       });
       this.revenueLY = [];
@@ -455,7 +505,7 @@ export default {
     async loadGraph2() {
       this.g2loaded = false;
       let g2data = await this.$store.dispatch("graphs/graphTwo", {
-        location: this.location,
+        location: this.location.label,
         period: this.periodNum
       });
       this.revenueAccounts = this.accounts(g2data);
@@ -464,7 +514,7 @@ export default {
     async loadGraph5() {
       this.g5loaded = false;
       let g5data = await this.$store.dispatch("graphs/graphFiveCOGS", {
-        location: this.location,
+        location: this.location.label,
         selector: this.cogsSelector,
         p: this.currentPeriod
       });
@@ -593,7 +643,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .rev-table {
   width: 90%;
   padding: 50px;
@@ -612,5 +662,30 @@ export default {
   width: 100%;
   height: 600px;
   padding: 50px;
+}
+
+.el-tree {
+  width: 220px;
+  &.with-border {
+    border: 3px solid black;
+  }
+
+  /deep/ .el-tree-node {
+    &.is-current {
+      .el-tree-node__content {
+        .custom-tree-node {
+          .location-label {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+.el-row {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
 }
 </style>

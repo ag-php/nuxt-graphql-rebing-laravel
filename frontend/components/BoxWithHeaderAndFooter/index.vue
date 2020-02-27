@@ -89,13 +89,13 @@ export default {
   watch: {
     salesData: {
       handler(val) {
-        this.total = Math.round(
-          this.$props.totalSales ? val.cgs_actual / this.$props.totalSales : 0
-        );
+        this.total = 
+          val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100/ val.sales_actual).toFixed(2) : 0
+        ;
         this.target = convertCurrencySales(val.cgs_target);
         this.sales = convertCurrencySales(val.sales_actual);
         this.cgsTarget = convertCurrencySales(this.target * this.sales);
-        this.purchase = convertCurrencySales(val.purchase_actual);
+        this.purchase = convertCurrencySales(val.cgs_actual);
         this.toSpend = convertCurrencySales(this.cgsTarget - this.purchase);
       },
       deep: true

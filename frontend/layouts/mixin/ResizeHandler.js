@@ -9,6 +9,9 @@ export default {
       if (this.device === 'mobile' && this.sidebar.opened) {
         this.$store.dispatch('app/closeSideBar', { withoutAnimation: true })
       }
+    },
+    isMobile: function(newVal){
+      console.log("device is changed")
     }
   },
   // beforeMount() {
@@ -24,6 +27,11 @@ export default {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: true })
     }
   },
+  computed: {
+    isMobile: function(){
+      return this.$device.isMobile;
+    }
+  }
   // methods: {
   //   // use $_ for mixins properties
   //   // https://vuejs.org/v2/style-guide/index.html#Private-property-names-essential

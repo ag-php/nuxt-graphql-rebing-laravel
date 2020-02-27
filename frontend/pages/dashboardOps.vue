@@ -3,14 +3,24 @@
     <h1>Ops Dashboard</h1>
     <br />
     <div class="top-container">
-      <el-row class="row-bg top-container" justify="center" style="padding-top: 20px;">
-        <el-col :sm="24" :md="8" v-for="(topBox, i) in topBoxes" :key="i" v-bind:class="{ 'mb-4': $device.isMobile}">
+      <el-row
+        class="row-bg top-container"
+        justify="center"
+        style="padding-top: 20px;"
+      >
+        <el-col
+          :sm="24"
+          :md="8"
+          v-for="(topBox, i) in topBoxes"
+          :key="i"
+          v-bind:class="{ 'mb-4': $device.isMobile }"
+        >
           <box-with-title-box :boxTheme="topBox.boxTheme">
             <template v-slot:header>
-              <span>{{topBox.titleText}}</span>
+              <span>{{ topBox.titleText }}</span>
             </template>
             <template v-slot:content>
-              <div v-if="i==0">
+              <div v-if="i == 0">
                 <el-date-picker
                   v-model="dateRange"
                   type="daterange"
@@ -22,6 +32,7 @@
                   end-placeholder="End"
                   :clearable="false"
                   :picker-options="pickerOptions"
+                  @change="dateRangeForTopBoxChanged"
                 ></el-date-picker>
               </div>
               <span v-if="i != 0">${{ topBox.contentText }}</span>
@@ -34,44 +45,92 @@
         justify="center"
         style="padding-bottom: 20px;"
       >
-        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
-          <box-with-header-and-footer boxTheme="blue" :salesData="foodbev" title="FOOD"></box-with-header-and-footer>
+        <el-col
+          :sm="24"
+          :md="11"
+          :lg="3"
+          v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
+        >
+          <box-with-header-and-footer
+            boxTheme="blue"
+            :salesData="foodbev"
+            title="FOOD"
+          ></box-with-header-and-footer>
         </el-col>
         <el-col v-if="!$device.isMobile" :sm="2" :md="2">
           <bar-h barTheme="blue-black"></bar-h>
         </el-col>
 
-        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
-          <box-with-header-and-footer boxTheme="white" :salesData="beer" title="BEER"></box-with-header-and-footer>
+        <el-col
+          :sm="24"
+          :md="11"
+          :lg="3"
+          v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
+        >
+          <box-with-header-and-footer
+            boxTheme="white"
+            :salesData="beer"
+            title="BEER"
+          ></box-with-header-and-footer>
         </el-col>
         <el-col v-if="$device.isDesktop" :md="2">
           <bar-h barTheme="black-blue"></bar-h>
         </el-col>
 
-        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
-          <box-with-header-and-footer boxTheme="blue" :salesData="liquor" title="LIQUOR"></box-with-header-and-footer>
+        <el-col
+          :sm="24"
+          :md="11"
+          :lg="3"
+          v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
+        >
+          <box-with-header-and-footer
+            boxTheme="blue"
+            :salesData="liquor"
+            title="LIQUOR"
+          ></box-with-header-and-footer>
         </el-col>
         <el-col v-if="!$device.isMobile" :md="2">
           <bar-h barTheme="blue-black"></bar-h>
         </el-col>
 
-        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
-          <box-with-header-and-footer boxTheme="white" :salesData="wine" title="WINE"></box-with-header-and-footer>
+        <el-col
+          :sm="24"
+          :md="11"
+          :lg="3"
+          v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
+        >
+          <box-with-header-and-footer
+            boxTheme="white"
+            :salesData="wine"
+            title="WINE"
+          ></box-with-header-and-footer>
         </el-col>
         <el-col v-if="$device.isDesktop" :md="2">
           <bar-h barTheme="black-green"></bar-h>
         </el-col>
 
-        <el-col :sm="24" :md="11" :lg="3" v-bind:class="{ 'mb-4 mx-4': $device.isMobile}">
-          <box-with-header-and-footer boxTheme="green"></box-with-header-and-footer>
+        <el-col
+          :sm="24"
+          :md="11"
+          :lg="3"
+          v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
+        >
+          <box-with-header-and-footer
+            boxTheme="green"
+          ></box-with-header-and-footer>
         </el-col>
       </el-row>
     </div>
 
     <el-row :gutter="5" class="row-bg" justify="center">
-      <el-col :sm="24" :md="12" :lg="10" v-bind:class="{ 'mb-4': $device.isMobile}">
+      <el-col
+        :sm="24"
+        :md="12"
+        :lg="10"
+        v-bind:class="{ 'mb-4': $device.isMobile }"
+      >
         <el-row :gutter="5" justify="center">
-          <el-col :sm="24" :md="10" v-bind:class="{ 'mb-4': $device.isMobile}">
+          <el-col :sm="24" :md="10" v-bind:class="{ 'mb-4': $device.isMobile }">
             <el-tree
               :data="locationEntries"
               node-key="id"
@@ -81,8 +140,11 @@
             >
               <span class="custom-tree-node" slot-scope="{ node }">
                 <span
-                  v-bind:class="{'location-label': node.label === location.label}"
-                >{{ node.label.replace(/[^a-z0-9+]+/gi, ' ') }}</span>
+                  v-bind:class="{
+                    'location-label': node.label === location.label
+                  }"
+                  >{{ node.label.replace(/[^a-z0-9+]+/gi, " ") }}</span
+                >
               </span>
             </el-tree>
 
@@ -102,7 +164,12 @@
               style="margin-top: 6px;"
               class="with-border blue-box"
             >
-              <el-option v-for="item in selectorOptions" :key="item" :label="item" :value="item"></el-option>
+              <el-option
+                v-for="item in selectorOptions"
+                :key="item"
+                :label="item"
+                :value="item"
+              ></el-option>
             </el-select>
           </el-col>
           <el-col :sm="24" :md="14">
@@ -111,22 +178,46 @@
                 <span>SALES</span>
               </template>
               <template v-slot:content>
-                <el-table :data="totalSalesTable" style="width: 100%" height="300" max-height="300">
-                  <el-table-column prop="category" label :min-width="20"></el-table-column>
-                  <el-table-column prop="actual" label="ACTUAL" :min-width="26.66">
+                <el-table
+                  :data="totalSalesTable"
+                  style="width: 100%"
+                  height="300"
+                  max-height="300"
+                >
+                  <el-table-column
+                    prop="category"
+                    label
+                    :min-width="20"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="actual"
+                    label="ACTUAL"
+                    :min-width="26.66"
+                  >
                     <template slot-scope="scope">
                       <span>${{ convertCurrencySales(scope.row.actual) }}</span>
                     </template>
                   </el-table-column>
                   <el-table-column prop="goal" label="GOAL" :min-width="26.66">
                     <template slot-scope="scope">
-                      <span>{{ scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                      <span>{{
+                        scope.row.goal >= 0
+                          ? "$" + convertCurrencySales(scope.row.goal)
+                          : "-$" +
+                            convertCurrencySales(Math.abs(scope.row.goal))
+                      }}</span>
                     </template>
                   </el-table-column>
 
-                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="26.66">
+                  <el-table-column
+                    prop="percentageOfGoal"
+                    label="% of GOAL"
+                    :min-width="26.66"
+                  >
                     <template slot-scope="scope">
-                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
+                      <span>{{
+                        convertCurrencySales(scope.row.percentageOfGoal)
+                      }}</span>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -159,7 +250,12 @@
                 </box-with-title-box>
               </el-col>
             </el-row>
-            <el-row type="flex" class="row-bg" justify="center" style="width: 100%">
+            <el-row
+              type="flex"
+              class="row-bg"
+              justify="center"
+              style="width: 100%"
+            >
               <el-col :span="11">
                 <box-with-title-box boxTheme="green-black medium-content">
                   <template v-slot:header>
@@ -194,7 +290,11 @@
               </template>
               <template v-slot:content>
                 <el-table :data="opexTable" style="width: 100%" height="300px">
-                  <el-table-column prop="category" label :min-width="34"></el-table-column>
+                  <el-table-column
+                    prop="category"
+                    label
+                    :min-width="34"
+                  ></el-table-column>
                   <el-table-column prop="actual" label="Actual" :min-width="22">
                     <template slot-scope="scope">
                       <span>${{ convertCurrencySales(scope.row.actual) }}</span>
@@ -202,12 +302,23 @@
                   </el-table-column>
                   <el-table-column prop="goal" label="GOAL" :min-width="22">
                     <template slot-scope="scope">
-                      <span>{{ scope.row.goal >= 0 ? '$' + convertCurrencySales(scope.row.goal) : '-$' + convertCurrencySales(Math.abs(scope.row.goal)) }}</span>
+                      <span>{{
+                        scope.row.goal >= 0
+                          ? "$" + convertCurrencySales(scope.row.goal)
+                          : "-$" +
+                            convertCurrencySales(Math.abs(scope.row.goal))
+                      }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="percentageOfGoal" label="% of GOAL" :min-width="22">
+                  <el-table-column
+                    prop="percentageOfGoal"
+                    label="% of GOAL"
+                    :min-width="22"
+                  >
                     <template slot-scope="scope">
-                      <span>{{ convertCurrencySales(scope.row.percentageOfGoal) }}</span>
+                      <span>{{
+                        convertCurrencySales(scope.row.percentageOfGoal)
+                      }}</span>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -219,13 +330,19 @@
     </el-row>
 
     <el-row class="row-bg" justify="center">
-      <el-col :sm="24" :md="8" v-bind:class="{ 'mb-4': $device.isMobile}" v-for="(bottomBox, i) in bottomBoxes" :key="i">
+      <el-col
+        :sm="24"
+        :md="8"
+        v-bind:class="{ 'mb-4': $device.isMobile }"
+        v-for="(bottomBox, i) in bottomBoxes"
+        :key="i"
+      >
         <box-with-title-box :boxTheme="bottomBox.boxTheme">
           <template v-slot:header>
-            <span>{{bottomBox.titleText}}</span>
+            <span>{{ bottomBox.titleText }}</span>
           </template>
           <template v-slot:content>
-            <span>{{bottomBox.contentText}}</span>
+            <span>{{ bottomBox.contentText }}</span>
           </template>
         </box-with-title-box>
       </el-col>
@@ -244,8 +361,6 @@ import BoxWithHeaderAndFooter from "@/components/BoxWithHeaderAndFooter";
 import BarH from "@/components/BarH";
 import BoxWithBorder from "@/components/BoxWithBorder";
 
-const amt = (d, i) => d.find(r => r.p === i).amount;
-
 export default {
   middleware: "authenticated",
   layout: "app",
@@ -263,11 +378,11 @@ export default {
         label: null,
         children: []
       },
+      locations: [],
       currentPeriod: 1,
       periodNum: 1,
       period: null,
       month: null,
-      locations: [],
       datePickerOptions: {
         disabledDate(date) {
           return date > new Date() || date < new Date("01/01/2018");
@@ -386,7 +501,7 @@ export default {
         {
           id: 3,
           titleText: "LAST YEAR SALES",
-          contentText: this.totalSales,
+          contentText: this.lastYearSales,
           boxTheme: "green-blue"
         }
       ],
@@ -505,11 +620,6 @@ export default {
       )
         .toISOString()
         .slice(0, 10);
-
-      return Promise.all([
-        this.calculateAllSales(start, end),
-        this.calculatePriorYearSales(startForLastYear, endForLastYear)
-      ]);
     },
 
     allSales: {
@@ -566,13 +676,17 @@ export default {
       }
       return roots;
     },
+    
     async selectLocation(node) {
       this.location = node;
       await this.loadSalesForMiddleBoxes();
+      await this.loadSalesForTopBoxes();
     },
+
     convertCurrencySales(value) {
       return convertCurrencySales(value);
     },
+
     async periodChanged() {
       this.periodNum = await this.$store.dispatch(
         "graphs/periodReverse",
@@ -581,17 +695,30 @@ export default {
       this.period = await this.$store.dispatch("graphs/period", this.periodNum);
       await this.loadSalesForMiddleBoxes();
     },
-    async locationChanged() {
-      await this.loadSalesForMiddleBoxes();
-    },
+
     async targetSelectorChanged() {
       await this.loadSalesForMiddleBoxes();
     },
+
+    async dateRangeForTopBoxChanged() {
+      await this.loadSalesForTopBoxes();
+    },
+
+    async loadSalesForTopBoxes() {
+      this.initTopBoxes();
+      return Promise.all([
+        this.calculateAllSales(),
+        this.calculatePriorYearSales()
+      ]);
+    },
+
     async loadSalesForMiddleBoxes() {
+      this.initMiddleBoxTables();
       return Promise.all([this.loadSalesForMonth()]);
     },
+
     async loadSalesForMonth() {
-      this.initMiddleBoxTables();
+      
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
         {
@@ -634,18 +761,55 @@ export default {
         };
       });
     },
-    async calculateAllSales(start, end) {
+
+    async calculateAllSales() {
+      let start = new Date(this.dateRange[0]).toISOString().slice(0, 10);
+      let end = new Date(this.dateRange[1]).toISOString().slice(0, 10);
+
+      let startForLastYear = new Date(
+        new Date(start).setFullYear(new Date(start).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
+      let endForLastYear = new Date(
+        new Date(end).setFullYear(new Date(end).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
+
       this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
         start: start,
-        end: end
+        end: end,
+        location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent"
       });
+
+
     },
-    async calculatePriorYearSales(start, end) {
+
+    async calculatePriorYearSales() {
+      let start = new Date(this.dateRange[0]).toISOString().slice(0, 10);
+      let end = new Date(this.dateRange[1]).toISOString().slice(0, 10);
+
+      let startForLastYear = new Date(
+        new Date(start).setFullYear(new Date(start).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
+      let endForLastYear = new Date(
+        new Date(end).setFullYear(new Date(end).getFullYear() - 1)
+      )
+        .toISOString()
+        .slice(0, 10);
       let lastYearSalesData = await this.$store.dispatch(
         "dashboardOps/getAllSales",
         {
-          start: start,
-          end: end
+          start: startForLastYear,
+          end: endForLastYear,
+          location: this.location.label,
+          locationId: this.location.id,
+          isParent: this.location.acct_type === "parent"
         }
       );
 
@@ -664,6 +828,53 @@ export default {
         } else return sum;
       }, 0);
     },
+
+    initTopBoxes() {
+      this.totalSales = "0";
+      this.lastYearSales = "0";
+      this.foodbev = {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      this.beer = {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+
+      this.liquor = {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      this.wine = {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      },
+      this.apparel = {
+        sales_actual: null,
+        sales_target: null,
+        purchase_actual: null,
+        purchase_target: null,
+        cgs_actual: null,
+        cgs_target: null
+      }
+    },
+
     initMiddleBoxTables() {
       this.totalSalesTable = [
         {
@@ -734,12 +945,13 @@ export default {
           goal: 0,
           percentageOfGoal: 0
         }
-      ]
+      ];
     }
   },
   async mounted() {
-    this.totalSales = "0";
-    this.lastYearSales = "0";
+    this.initTopBoxes();
+    this.initMiddleBoxTables();
+
     this.dateRange = getCurrentWeekDays();
     let init = await this.$store.dispatch("graphs/periodReverse", new Date());
     this.currentPeriod = init;
@@ -747,8 +959,6 @@ export default {
 
     this.period = await this.$store.dispatch("graphs/period", this.periodNum);
     this.month = new Date("01 " + this.period.month + " " + this.period.year);
-
-    this.initMiddleBoxTables();
 
     this.locations = await this.$store.dispatch("graphs/locations");
 
@@ -768,6 +978,8 @@ export default {
     this.location = this.locationEntries[0];
 
     await this.loadSalesForMiddleBoxes();
+
+    await this.loadSalesForTopBoxes();
   }
 };
 
@@ -786,11 +998,18 @@ export default {
   padding-left: 16px;
   padding-right: 16px;
 }
-.mb-4{
+.mb-4 {
   margin-bottom: 16px;
 }
 .el-row {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+  
   &:last-child {
     margin-bottom: 0;
   }
@@ -810,7 +1029,7 @@ export default {
 .el-tree {
   &.with-border {
     border: 3px solid black;
-    }
+  }
 
   /deep/ .el-tree-node {
     &.is-current {
