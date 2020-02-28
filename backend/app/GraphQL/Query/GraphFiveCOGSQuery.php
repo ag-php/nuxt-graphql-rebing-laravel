@@ -29,6 +29,14 @@ class GraphFiveCOGSQuery extends AuthenticatedQuery
                 'name' => 'location',
                 'type' => Type::string()
             ],
+            'locationId' => [
+              'name' => 'locationId',
+              'type' => Type::nonNull(Type::int())
+            ],
+            'isParent' => [
+              'name' => 'isParent',
+              'type' => Type::nonNull(Type::boolean())
+            ],
             'startP' => [
                 'name' => 'startP',
                 'type' => Type::nonNull(Type::int())
@@ -47,7 +55,19 @@ class GraphFiveCOGSQuery extends AuthenticatedQuery
     public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
     {
         $location = $args['location'];
-        $andLocation = $location ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : '';
+        $isParent = $args['isParent'];
+        $acctId = $args['locationId'];
+
+        $andLocation = '';
+        if ($location && $acctId) {
+          $andLocation = !$isParent? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : 
+          "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
+          FROM (SELECT * FROM costcenter_tree
+          ORDER BY parent, acct_id) costcenter_tree_sorted,
+          (SELECT @pv := '$acctId') initialisation
+          WHERE FIND_IN_SET(parent, @pv)
+          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+        }
 
         $groupBy = $location ? ", `master_fcst_web`.`Mid4Desc`" : '';
 

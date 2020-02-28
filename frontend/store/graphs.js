@@ -86,7 +86,12 @@ export const actions = {
         const client = await dispatch('user/gqlClient', true, { root: true })
         const data = await client.request(`
         query {
-            graphOneTotals(location: "${params.location}", period: ${params.period}, selector: "${params.selector}")
+            graphOneTotals(
+              location: "${params.location}", 
+              locationId: ${params.locationId}, 
+              isParent: ${params.isParent},
+              period: ${params.period}, 
+              selector: "${params.selector}")
         }`)
         return data.graphOneTotals
     },
@@ -94,7 +99,12 @@ export const actions = {
         const client = await dispatch('user/gqlClient', true, { root: true })
         const data = await client.request(`
         query {
-            graphOne(location: "${params.location}", period: ${params.period}) {
+            graphOne(
+              location: "${params.location}",
+              period: ${params.period},
+              locationId: ${params.locationId}, 
+              isParent: ${params.isParent},
+              ) {
                 location
                 p
                 m
@@ -108,7 +118,12 @@ export const actions = {
         const client = await dispatch('user/gqlClient', true, { root: true })
         const data = await client.request(`
         query {
-            graphTwo(location: "${params.location}", period: ${params.period}) {
+            graphTwo(
+              location: "${params.location}", 
+              period: ${params.period},
+              locationId: ${params.locationId}, 
+              isParent: ${params.isParent},
+              ) {
                 location
                 account
                 amount
@@ -131,6 +146,8 @@ export const actions = {
             client.request(`query {
                 graphFiveCOGS(
                     location: "${params.location}",
+                    locationId: ${params.locationId}, 
+                    isParent: ${params.isParent},
                     selector: "actuals",
                     startP: ${startP},
                     endP: ${endP}
@@ -139,6 +156,8 @@ export const actions = {
             client.request(`query {
                 graphFiveCOGS(
                     location: "${params.location}",
+                    locationId: ${params.locationId}, 
+                    isParent: ${params.isParent},
                     selector: "actuals",
                     startP: ${startLYP},
                     endP: ${endLYP}
@@ -147,6 +166,8 @@ export const actions = {
             client.request(`query {
                 graphFiveCOGS(
                     location: "${params.location}",
+                    locationId: ${params.locationId}, 
+                    isParent: ${params.isParent},
                     selector: "${params.selector}",
                     startP: ${startP},
                     endP: ${endP}
@@ -174,6 +195,8 @@ export const actions = {
                 graphSixIndividual(
                     category: ${params.category},
                     location: "${params.location}",
+                    locationId: ${params.locationId}, 
+                    isParent: ${params.isParent},
                     selector: "actuals",
                     startP: ${startP},
                     endP: ${endP}
@@ -183,6 +206,8 @@ export const actions = {
                 graphSixIndividual(
                     category: ${params.category},
                     location: "${params.location}",
+                    locationId: ${params.locationId}, 
+                    isParent: ${params.isParent},
                     selector: "${params.selector}",
                     startP: ${startP},
                     endP: ${endP}

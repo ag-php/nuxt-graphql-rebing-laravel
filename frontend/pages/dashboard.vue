@@ -10,7 +10,6 @@
           :expand-on-click-node="false"
           @node-click="locationChanged"
           class="with-border"
-          default-expand-all
         >
           <span class="custom-tree-node" slot-scope="{ node }">
             <span
@@ -399,7 +398,7 @@ export default {
       )
     );
 
-    this.location = this.locationEntries[0].children[0];
+    this.location = this.locationEntries[0];
 
     this.categories = await this.$store.dispatch("graphs/categories");
 
@@ -438,10 +437,8 @@ export default {
     },
 
     async locationChanged(node) {
-      if (node.acct_type == "child") {
         this.location = node;
         await this.loadGraphs();
-      }
     },
 
     async loadGraphs() {
@@ -457,6 +454,8 @@ export default {
       this.g1loaded = false;
       let g1dataA = await this.$store.dispatch("graphs/graphOne", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum
       });
       this.revenueCY = [];
@@ -471,6 +470,8 @@ export default {
 
       let g1dataB = await this.$store.dispatch("graphs/graphOne", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum - 12
       });
       this.revenueLY = [];
@@ -498,12 +499,16 @@ export default {
 
       this.targetRevenue = await this.$store.dispatch("graphs/graphOneTotals", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum,
         selector: this.targetSelector
       });
 
       this.totalRevenue = await this.$store.dispatch("graphs/graphOneTotals", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum,
         selector: "actuals"
       });
@@ -513,6 +518,8 @@ export default {
           "graphs/graphOneTotals",
           {
             location: this.location.label,
+            locationId: this.location.id,
+            isParent: this.location.acct_type === "parent",
             period: periodLY,
             selector: "actuals"
           }
@@ -527,6 +534,8 @@ export default {
       this.g2loaded = false;
       let g2data = await this.$store.dispatch("graphs/graphTwo", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum
       });
       this.revenueAccounts = this.accounts(g2data);
@@ -536,6 +545,8 @@ export default {
       this.g5loaded = false;
       let g5data = await this.$store.dispatch("graphs/graphFiveCOGS", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         selector: this.targetSelector,
         p: this.periodNum
       });
@@ -554,6 +565,8 @@ export default {
       this.categories.forEach(async c => {
         let g6data = await this.$store.dispatch("graphs/graphSixIndividual", {
           location: this.location.label,
+          locationId: this.location.id,
+          isParent: this.location.acct_type === "parent",
           selector: this.targetSelector,
           p: this.periodNum,
           category: c["id"]

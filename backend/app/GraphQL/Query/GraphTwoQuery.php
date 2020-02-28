@@ -31,15 +31,35 @@ class GraphTwoQuery extends AuthenticatedQuery
             'period' => [
                 'name' => 'period',
                 'type' => Type::nonNull(Type::int())
-            ]
+            ],
+            'locationId' => [
+              'name' => 'locationId',
+              'type' => Type::nonNull(Type::int())
+            ],
+            'isParent' => [
+              'name' => 'isParent',
+              'type' => Type::nonNull(Type::boolean())
+            ],
         ];
     }
 
     public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
     {
         $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
+        $isParent = $args['isParent'];
+        $acctId = $args['locationId'];
 
-        $andLocation = $location ? "AND `master_fcst_layout_tbl`.`cc` = \"$location\"" : '';
+        $andLocation = '';
+        if ($location && $acctId) {
+          $andLocation = !$isParent? "AND `master_fcst_layout_tbl`.`cc` = \"$location\"" : 
+          "AND `master_fcst_layout_tbl`.`cc` IN (SELECT acct
+          FROM (SELECT * FROM costcenter_tree
+          ORDER BY parent, acct_id) costcenter_tree_sorted,
+          (SELECT @pv := '$acctId') initialisation
+          WHERE FIND_IN_SET(parent, @pv)
+          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+        }
+
         $groupBy = $location ? "`master_fcst_layout_tbl`.`cc` , " : "";
         $groupBy = "$groupBy `master_fcst_layout_tbl`.`acct`";
 

@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Query;
 
+use Log;
 use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
@@ -31,14 +32,35 @@ class GraphOneQuery extends AuthenticatedQuery
             'period' => [
                 'name' => 'period',
                 'type' => Type::nonNull(Type::int())
-            ]
+            ],
+            'locationId' => [
+              'name' => 'locationId',
+              'type' => Type::nonNull(Type::int())
+            ],
+            'isParent' => [
+              'name' => 'isParent',
+              'type' => Type::nonNull(Type::boolean())
+            ],
         ];
     }
 
     public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
     {
         $location = $args['location'];
-        $andLocation = $location ? "AND `pldetailpivot`.`Mid4Desc` = \"$location\"" : '';
+        $isParent = $args['isParent'];
+        $acctId = $args['locationId'];
+        
+        $andLocation = '';
+        if ($location && $acctId) {
+          $andLocation = !$isParent? "AND `pldetailpivot`.`Mid4Desc` = \"$location\"" : 
+          "AND `pldetailpivot`.`Mid4Desc` IN (SELECT acct
+          FROM (SELECT * FROM costcenter_tree
+          ORDER BY parent, acct_id) costcenter_tree_sorted,
+          (SELECT @pv := '$acctId') initialisation
+          WHERE FIND_IN_SET(parent, @pv)
+          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+        }
+               
         if ($location) {
             $groupBy = "`pldetailpivot`.`FCSTDesc` , `pldetailpivot`.`Mid4Desc` , `pldetailpivot`.`Period` , `Periods2`.`Month` , `Periods2`.`Year`";
         } else {
@@ -67,6 +89,7 @@ class GraphOneQuery extends AuthenticatedQuery
             GROUP BY $groupBy
             ORDER BY CAST(substring(`pldetailpivot`.`Period`, 2, 2) AS SIGNED)
 SQL;
+Log::info($sql);
         return DB::connection('tenant')->select($sql);
     }
 }

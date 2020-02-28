@@ -37,6 +37,14 @@ class GraphOneTotalsQuery extends AuthenticatedQuery
                 'name' => 'selector',
                 'type' => Type::nonNull(Type::string())
             ],
+            'locationId' => [
+              'name' => 'locationId',
+              'type' => Type::nonNull(Type::int())
+            ],
+            'isParent' => [
+              'name' => 'isParent',
+              'type' => Type::nonNull(Type::boolean())
+            ],
         ];
     }
 
@@ -44,7 +52,21 @@ class GraphOneTotalsQuery extends AuthenticatedQuery
     {
         $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
 
+        $isParent = $args['isParent'];
+        $acctId = $args['locationId'];
+
         $andLocation = $location ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : '';
+
+        $andLocation = '';
+        if ($location && $acctId) {
+          $andLocation = !$isParent? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : 
+          "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
+          FROM (SELECT * FROM costcenter_tree
+          ORDER BY parent, acct_id) costcenter_tree_sorted,
+          (SELECT @pv := '$acctId') initialisation
+          WHERE FIND_IN_SET(parent, @pv)
+          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+        }
 
         $groupBy = "`master_fcst_web`.`FCSTDesc`" . ($location ? " , `master_fcst_web`.`Mid4Desc`" : '');
 
@@ -68,7 +90,7 @@ class GraphOneTotalsQuery extends AuthenticatedQuery
     GROUP BY $groupBy
 SQL;
 
-        Log::info($sql);
+        
 
         $row = DB::connection('tenant')->select($sql)[0];
 
