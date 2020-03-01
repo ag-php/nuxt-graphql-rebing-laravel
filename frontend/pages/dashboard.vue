@@ -459,6 +459,7 @@ export default {
         period: this.periodNum
       });
       this.revenueCY = [];
+
       g1dataA.forEach(e =>
         this.revenueCY.push({
           name: e.m,
@@ -538,6 +539,7 @@ export default {
         isParent: this.location.acct_type === "parent",
         period: this.periodNum
       });
+
       this.revenueAccounts = this.accounts(g2data);
       this.g2loaded = true;
     },
@@ -572,6 +574,8 @@ export default {
           category: c["id"]
         });
 
+        console.log("g6data", g6data);
+
         let r = [];
         g6data.actualsData.forEach((g6, i) => {
           r.push([
@@ -586,40 +590,46 @@ export default {
 
       this.g6loaded = true;
     },
-    revCY(d) {
-      let r = [];
-      let f = d.filter(e => parseInt(e.p.replace(/\D/g, "")) > 12);
-      f.forEach(e => {
-        r.push({
-          name: e.m,
-          month: e.mn,
-          year: e.y,
-          revenue: e.amount
-        });
-      });
-      return r;
-    },
-    revLY(d) {
-      let r = [];
-      let f = d.filter(e => parseInt(e.p.replace(/\D/g, "")) <= 12);
-      f.forEach(e => {
-        r.push({
-          name: e.m,
-          month: e.mn,
-          year: e.y,
-          revenue: e.amount
-        });
-      });
-      return r;
-    },
+    // revCY(d) {
+    //   let r = [];
+    //   let f = d.filter(e => parseInt(e.p.replace(/\D/g, "")) > 12);
+    //   f.forEach(e => {
+    //     r.push({
+    //       name: e.m,
+    //       month: e.mn,
+    //       year: e.y,
+    //       revenue: e.amount
+    //     });
+    //   });
+    //   return r;
+    // },
+    // revLY(d) {
+    //   let r = [];
+    //   let f = d.filter(e => parseInt(e.p.replace(/\D/g, "")) <= 12);
+    //   f.forEach(e => {
+    //     r.push({
+    //       name: e.m,
+    //       month: e.mn,
+    //       year: e.y,
+    //       revenue: e.amount
+    //     });
+    //   });
+    //   return r;
+    // },
     accounts(d) {
       let r = [];
-      d.forEach(e =>
+      d.forEach(e => {
+        const index = r.findIndex(item => item.name === e.account.replace(/\d/g, "").trim());
+        if (index > -1 ) {
+          r[index].revenue += e.amount;
+        }
+        else 
         r.push({
           name: e.account.replace(/\d/g, "").trim(),
-          revenue: this.intl.format(e.amount)
+          revenue: e.amount
         })
-      );
+      });
+      r = r.map(item => ({...item, revenue: this.intl.format(item.revenue) }))
       return r;
     },
     title(text) {

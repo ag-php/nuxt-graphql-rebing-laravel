@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Query;
 
+use Log;
 use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
@@ -85,7 +86,7 @@ SQL;
         $d = [];
         foreach($rows as $row) {
             $d[] = [
-                'location' => $location ?: '',
+                'location' => $row->cc ?: '',
                 'account' => $row->acct,
                 'amount' => $row->amount
             ];

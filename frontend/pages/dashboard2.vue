@@ -10,7 +10,6 @@
           :expand-on-click-node="false"
           @node-click="locationChanged"
           class="with-border"
-          default-expand-all
         >
           <span class="custom-tree-node" slot-scope="{ node }">
             <span
@@ -22,15 +21,14 @@
           </span>
         </el-tree>
 
-      <el-date-picker
-        v-model="month"
-        type="month"
-        placeholder="Pick a month"
-        :picker-options="datePickerOptions"
-        @change="getPeriodNum"
-      ></el-date-picker>
+        <el-date-picker
+          v-model="month"
+          type="month"
+          placeholder="Pick a month"
+          :picker-options="datePickerOptions"
+          @change="getPeriodNum"
+        ></el-date-picker>
       </el-row>
-      
 
       <!-- <table class="rev-table">
                 <tr>
@@ -63,7 +61,11 @@
 
         <div style="width:50%; padding: 50px; float: right">
           <h2>Revenue Mix - Top 10 Accounts</h2>
-          <el-table v-if="g2loaded" :data="revenueAccounts" style="padding: 50px;">
+          <el-table
+            v-if="g2loaded"
+            :data="revenueAccounts"
+            style="padding: 50px;"
+          >
             <el-table-column label>
               <template slot-scope="scope">{{ scope.row.name }}</template>
             </el-table-column>
@@ -74,8 +76,17 @@
         </div>
       </div>
 
-      <el-select v-model="cogsSelector" placeholder="Selector" @change="cogsSelectorChanged">
-        <el-option v-for="item in cogsOptions" :key="item" :label="item" :value="item"></el-option>
+      <el-select
+        v-model="cogsSelector"
+        placeholder="Selector"
+        @change="cogsSelectorChanged"
+      >
+        <el-option
+          v-for="item in cogsOptions"
+          :key="item"
+          :label="item"
+          :value="item"
+        ></el-option>
       </el-select>
 
       <div class="cogs-charts">
@@ -84,15 +95,27 @@
 
       <el-row :gutter="10">
         <el-col :xs="4" :sm="6" :md="8" :lg="9" :xl="11">
-          <bar-chart :title="title('Food')" :series="series('food')" :source="source('food')" />
+          <bar-chart
+            :title="title('Food')"
+            :series="series('food')"
+            :source="source('food')"
+          />
         </el-col>
         <el-col :xs="4" :sm="6" :md="8" :lg="9" :xl="11">
-          <bar-chart :series="series('beer')" :source="source('beer')" :title="title('Beer')" />
+          <bar-chart
+            :series="series('beer')"
+            :source="source('beer')"
+            :title="title('Beer')"
+          />
         </el-col>
       </el-row>
       <el-row :gutter="10">
         <el-col :xs="4" :sm="6" :md="8" :lg="9" :xl="11">
-          <bar-chart :series="series('wine')" :source="source('wine')" :title="title('Wine')" />
+          <bar-chart
+            :series="series('wine')"
+            :source="source('wine')"
+            :title="title('Wine')"
+          />
         </el-col>
         <el-col :xs="4" :sm="6" :md="8" :lg="9" :xl="11">
           <bar-chart
@@ -142,7 +165,7 @@ export default {
       )
     );
 
-    this.location = this.locationEntries[0].children[0];
+    this.location = this.locationEntries[0];
 
     await this.loadGraphs();
   },
@@ -451,10 +474,8 @@ export default {
       return roots;
     },
     async locationChanged(node) {
-      if (node.acct_type == "child") {
-        this.location = node;
-        await this.loadGraphs();
-      }
+      this.location = node;
+      await this.loadGraphs();
     },
     async loadGraphs() {
       return Promise.all([
@@ -467,6 +488,8 @@ export default {
       this.g1loaded = false;
       let g1dataA = await this.$store.dispatch("graphs/graphOne", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum
       });
       this.revenueCY = [];
@@ -481,6 +504,8 @@ export default {
 
       let g1dataB = await this.$store.dispatch("graphs/graphOne", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum - 12
       });
       this.revenueLY = [];
@@ -506,6 +531,8 @@ export default {
       this.g2loaded = false;
       let g2data = await this.$store.dispatch("graphs/graphTwo", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         period: this.periodNum
       });
       this.revenueAccounts = this.accounts(g2data);
@@ -515,6 +542,8 @@ export default {
       this.g5loaded = false;
       let g5data = await this.$store.dispatch("graphs/graphFiveCOGS", {
         location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
         selector: this.cogsSelector,
         p: this.currentPeriod
       });
@@ -684,8 +713,8 @@ export default {
 }
 
 .el-row {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: row;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
 }
 </style>

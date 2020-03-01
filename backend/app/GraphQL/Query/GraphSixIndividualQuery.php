@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Query;
 
+use Log;
 use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
@@ -86,6 +87,8 @@ class GraphSixIndividualQuery extends AuthenticatedQuery
         `master_fcst_web`.`Mid4Desc` AS `Mid4Desc`,
 
 SQL;
+
+
 
 for ($i = $startP; $i <= $endP; $i++) {
 

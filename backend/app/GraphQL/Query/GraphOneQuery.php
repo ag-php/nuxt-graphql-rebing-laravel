@@ -89,7 +89,7 @@ class GraphOneQuery extends AuthenticatedQuery
             GROUP BY $groupBy
             ORDER BY CAST(substring(`pldetailpivot`.`Period`, 2, 2) AS SIGNED)
 SQL;
-Log::info($sql);
+
         return DB::connection('tenant')->select($sql);
     }
 }
