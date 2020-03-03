@@ -13,68 +13,68 @@ use App\GraphQL\Support\AuthenticatedQuery;
 
 class GraphOneTotalsQuery extends AuthenticatedQuery
 {
-    protected $attributes = [
-        'name' => 'GraphTwo'
+  protected $attributes = [
+    'name' => 'GraphTwo'
+  ];
+
+  public function type(): Type
+  {
+    return Type::float();
+  }
+
+  public function args(): array
+  {
+    return [
+      'location' => [
+        'name' => 'location',
+        'type' => Type::string()
+      ],
+      'period' => [
+        'name' => 'period',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'selector' => [
+        'name' => 'selector',
+        'type' => Type::nonNull(Type::string())
+      ],
+      'locationId' => [
+        'name' => 'locationId',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'isParent' => [
+        'name' => 'isParent',
+        'type' => Type::nonNull(Type::boolean())
+      ],
     ];
+  }
 
-    public function type(): Type
-    {
-        return Type::float();
-    }
+  public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+  {
+    $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
 
-    public function args(): array
-    {
-        return [
-            'location' => [
-                'name' => 'location',
-                'type' => Type::string()
-            ],
-            'period' => [
-                'name' => 'period',
-                'type' => Type::nonNull(Type::int())
-            ],
-            'selector' => [
-                'name' => 'selector',
-                'type' => Type::nonNull(Type::string())
-            ],
-            'locationId' => [
-              'name' => 'locationId',
-              'type' => Type::nonNull(Type::int())
-            ],
-            'isParent' => [
-              'name' => 'isParent',
-              'type' => Type::nonNull(Type::boolean())
-            ],
-        ];
-    }
+    $isParent = $args['isParent'];
+    $acctId = $args['locationId'];
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
-    {
-        $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
+    $andLocation = $location ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : '';
 
-        $isParent = $args['isParent'];
-        $acctId = $args['locationId'];
-
-        $andLocation = $location ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : '';
-
-        $andLocation = '';
-        if ($location && $acctId) {
-          $andLocation = !$isParent? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : 
-          "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
+    $andLocation = '';
+    if ($location && $acctId) {
+      $andLocation = !$isParent ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" :
+        "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
           FROM (SELECT * FROM costcenter_tree
           ORDER BY parent, acct_id) costcenter_tree_sorted,
           (SELECT @pv := '$acctId') initialisation
           WHERE FIND_IN_SET(parent, @pv)
           AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
-        }
+    }
 
-        $groupBy = "`master_fcst_web`.`FCSTDesc`" . ($location ? " , `master_fcst_web`.`Mid4Desc`" : '');
+    $groupBy = "`master_fcst_web`.`FCSTDesc`" . ($location ? " , `master_fcst_web`.`Mid4Desc`" : '');
 
-        $period = $args['period'];
+    $period = $args['period'];
 
-        $selector = $args['selector'];
+    $selector = $args['selector'];
 
-        $sql = <<<SQL
+    $sql = <<<SQL
     SELECT
         `master_fcst_web`.`FCSTDesc` AS `selector`,
         `master_fcst_web`.`Mid4Desc` AS `location`,
@@ -89,11 +89,16 @@ class GraphOneTotalsQuery extends AuthenticatedQuery
         $andLocation)
     GROUP BY $groupBy
 SQL;
+    
+    $data = DB::connection('tenant')->select($sql);
 
-        
-
-        $row = DB::connection('tenant')->select($sql)[0];
-
-        return $row->revenue;
-    }
+    if ($isParent) {
+      $revenue = 0;
+      foreach ($data as $row) {
+        $revenue += $row->revenue;
+      }
+      return $revenue;
+    } else
+      return $data[0]->revenue;
+  }
 }

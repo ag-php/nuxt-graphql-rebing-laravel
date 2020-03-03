@@ -12,9 +12,9 @@ import { createStore } from './store.js'
 
 /* Plugins */
 
-import nuxt_plugin_workbox_4be20e32 from 'nuxt_plugin_workbox_4be20e32' // Source: .\\workbox.js (mode: 'client')
-import nuxt_plugin_nuxticons_eab3e4c6 from 'nuxt_plugin_nuxticons_eab3e4c6' // Source: .\\nuxt-icons.js (mode: 'all')
-import nuxt_plugin_libplugin119573ca_4ff8a9d9 from 'nuxt_plugin_libplugin119573ca_4ff8a9d9' // Source: .\\lib.plugin.119573ca.js (mode: 'all')
+import nuxt_plugin_workbox_7118c151 from 'nuxt_plugin_workbox_7118c151' // Source: .\\workbox.js (mode: 'client')
+import nuxt_plugin_nuxticons_061774f3 from 'nuxt_plugin_nuxticons_061774f3' // Source: .\\nuxt-icons.js (mode: 'all')
+import nuxt_plugin_libplugin58cdd2c0_72aac4da from 'nuxt_plugin_libplugin58cdd2c0_72aac4da' // Source: .\\lib.plugin.58cdd2c0.js (mode: 'all')
 import nuxt_plugin_elementui_d905880e from 'nuxt_plugin_elementui_d905880e' // Source: ..\\plugins\\element-ui (mode: 'all')
 import nuxt_plugin_icons_229035a6 from 'nuxt_plugin_icons_229035a6' // Source: ..\\plugins\\icons (mode: 'all')
 import nuxt_plugin_snap_9260e884 from 'nuxt_plugin_snap_9260e884' // Source: ..\\plugins\\snap (mode: 'client')
@@ -174,16 +174,16 @@ async function createApp (ssrContext) {
 
   // Plugin execution
 
-  if (process.client && typeof nuxt_plugin_workbox_4be20e32 === 'function') {
-    await nuxt_plugin_workbox_4be20e32(app.context, inject)
+  if (process.client && typeof nuxt_plugin_workbox_7118c151 === 'function') {
+    await nuxt_plugin_workbox_7118c151(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_nuxticons_eab3e4c6 === 'function') {
-    await nuxt_plugin_nuxticons_eab3e4c6(app.context, inject)
+  if (typeof nuxt_plugin_nuxticons_061774f3 === 'function') {
+    await nuxt_plugin_nuxticons_061774f3(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_libplugin119573ca_4ff8a9d9 === 'function') {
-    await nuxt_plugin_libplugin119573ca_4ff8a9d9(app.context, inject)
+  if (typeof nuxt_plugin_libplugin58cdd2c0_72aac4da === 'function') {
+    await nuxt_plugin_libplugin58cdd2c0_72aac4da(app.context, inject)
   }
 
   if (typeof nuxt_plugin_elementui_d905880e === 'function') {

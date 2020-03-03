@@ -12,39 +12,39 @@ use App\GraphQL\Support\AuthenticatedQuery;
 
 class CategoriesQuery extends AuthenticatedQuery
 {
-    protected $attributes = [
-        'name' => 'Categories'
-    ];
+  protected $attributes = [
+    'name' => 'Categories'
+  ];
 
-    public function type(): Type
-    {
-        return Type::listOf(GraphQL::type('category'));
-    }
+  public function type(): Type
+  {
+    return Type::listOf(GraphQL::type('category'));
+  }
 
-    public function args(): array
-    {
-        return [];
-    }
+  public function args(): array
+  {
+    return [];
+  }
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
-    {
-        $sql = <<<SQL
+  public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+  {
+    $sql = <<<SQL
         SELECT `id`, `item`
         FROM `graph_setup` ORDER BY `id` ASC
 SQL;
 
-        $data = DB::connection('tenant')->select($sql);
+    $data = DB::connection('tenant')->select($sql);
 
-        $categories = [];
+    $categories = [];
 
-        foreach($data as $r) {
-            $name = str_replace('CGS ', '', trim(preg_replace('/[0-9]+/', '', $r->item)));
-            $categories[] = [
-                'id' => $r->id,
-                'name' => $name
-            ];
-        }
-
-        return $categories;
+    foreach ($data as $r) {
+      $name = str_replace('CGS ', '', trim(preg_replace('/[0-9]+/', '', $r->item)));
+      $categories[] = [
+        'id' => $r->id,
+        'name' => $name
+      ];
     }
+
+    return $categories;
+  }
 }

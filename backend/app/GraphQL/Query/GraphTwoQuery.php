@@ -81,6 +81,8 @@ class GraphTwoQuery extends AuthenticatedQuery
     GROUP BY $groupBy
 SQL;
 
+Log::info($sql);
+
         $rows = DB::connection('tenant')->select($sql);
 
         $d = [];

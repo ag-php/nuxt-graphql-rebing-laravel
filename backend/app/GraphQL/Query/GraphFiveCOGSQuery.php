@@ -13,80 +13,80 @@ use App\GraphQL\Support\AuthenticatedQuery;
 
 class GraphFiveCOGSQuery extends AuthenticatedQuery
 {
-    protected $attributes = [
-        'name' => 'GraphFiveCOGS'
+  protected $attributes = [
+    'name' => 'GraphFiveCOGS'
+  ];
+
+  public function type(): Type
+  {
+    return Type::listOf(Type::float());
+  }
+
+  public function args(): array
+  {
+    return [
+      'location' => [
+        'name' => 'location',
+        'type' => Type::string()
+      ],
+      'locationId' => [
+        'name' => 'locationId',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'isParent' => [
+        'name' => 'isParent',
+        'type' => Type::nonNull(Type::boolean())
+      ],
+      'startP' => [
+        'name' => 'startP',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'endP' => [
+        'name' => 'endP',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'selector' => [
+        'name' => 'selector',
+        'type' => Type::nonNull(Type::string())
+      ],
     ];
+  }
 
-    public function type(): Type
-    {
-        return Type::listOf(Type::float());
-    }
+  public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+  {
+    $location = $args['location'];
+    $isParent = $args['isParent'];
+    $acctId = $args['locationId'];
 
-    public function args(): array
-    {
-        return [
-            'location' => [
-                'name' => 'location',
-                'type' => Type::string()
-            ],
-            'locationId' => [
-              'name' => 'locationId',
-              'type' => Type::nonNull(Type::int())
-            ],
-            'isParent' => [
-              'name' => 'isParent',
-              'type' => Type::nonNull(Type::boolean())
-            ],
-            'startP' => [
-                'name' => 'startP',
-                'type' => Type::nonNull(Type::int())
-            ],
-            'endP' => [
-                'name' => 'endP',
-                'type' => Type::nonNull(Type::int())
-            ],
-            'selector' => [
-                'name' => 'selector',
-                'type' => Type::nonNull(Type::string())
-            ],
-        ];
-    }
-
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
-    {
-        $location = $args['location'];
-        $isParent = $args['isParent'];
-        $acctId = $args['locationId'];
-
-        $andLocation = '';
-        if ($location && $acctId) {
-          $andLocation = !$isParent? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" : 
-          "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
+    $andLocation = '';
+    if ($location && $acctId) {
+      $andLocation = !$isParent ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" :
+        "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
           FROM (SELECT * FROM costcenter_tree
           ORDER BY parent, acct_id) costcenter_tree_sorted,
           (SELECT @pv := '$acctId') initialisation
           WHERE FIND_IN_SET(parent, @pv)
           AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
-        }
+    }
 
-        $groupBy = $location ? ", `master_fcst_web`.`Mid4Desc`" : '';
+    $groupBy = $location ? ", `master_fcst_web`.`Mid4Desc`" : '';
 
-        $selector = $args['selector'];
-        $startP = intval($args['startP']);
-        $endP = intval($args['endP']);
+    $selector = $args['selector'];
+    $startP = intval($args['startP']);
+    $endP = intval($args['endP']);
 
-        $sql = <<<SQL
+    $sql = <<<SQL
     SELECT
         `master_fcst_web`.`FCSTDesc` AS `FCSTDesc`,
         `master_fcst_web`.`Mid4Desc` AS `Mid4Desc`,
 SQL;
 
-        for ($i = $startP; $i <= $endP; $i++) {
+    for ($i = $startP; $i <= $endP; $i++) {
 
-            $sql = $sql . "SUM(`master_fcst_web`.`P$i`) AS `P$i`" . (($i < $endP) ? ',' : '');
-        }
+      $sql = $sql . "SUM(`master_fcst_web`.`P$i`) AS `P$i`" . (($i < $endP) ? ',' : '');
+    }
 
-        $sql = $sql . <<<SQL
+    $sql = $sql . <<<SQL
     FROM
         (`master_fcst_web`
         LEFT JOIN `master_fcst_layout_tbl`
@@ -99,14 +99,23 @@ SQL;
         )
     GROUP BY `master_fcst_web`.`FCSTDesc` $groupBy
 SQL;
-Log::info($sql);
 
-        $row = DB::connection('tenant')->select($sql)[0];
-
-        $d = [];
+    if (!$isParent) {
+      $row = DB::connection('tenant')->select($sql)[0];
+      $d = [];
+      for ($i = $startP; $i <= $endP; $i++) {
+        $d[] = floatval($row->{"P$i"});
+      }
+      return $d;
+    } else {
+      $data = DB::connection('tenant')->select($sql);
+      $d = array_fill(0, $endP - $startP + 1, 0);
+      foreach ($data as $row) {
         for ($i = $startP; $i <= $endP; $i++) {
-            $d[] = floatval($row->{"P$i"});
+          $d[$i - $startP] += floatval($row->{"P$i"});
         }
-        return $d;
+      }
+      return $d;
     }
+  }
 }
