@@ -3,19 +3,19 @@ import Router from 'vue-router'
 import { interopDefault } from './utils'
 import scrollBehavior from './router.scrollBehavior.js'
 
-const _633551af = () => interopDefault(import('..\\pages\\boxesAssignment.vue' /* webpackChunkName: "pages_boxesAssignment" */))
-const _1531fa9d = () => interopDefault(import('..\\pages\\dashboard.vue' /* webpackChunkName: "pages_dashboard" */))
-const _ddb5fb36 = () => interopDefault(import('..\\pages\\dashboard2.vue' /* webpackChunkName: "pages_dashboard2" */))
-const _4a584e05 = () => interopDefault(import('..\\pages\\dashboardOps.vue' /* webpackChunkName: "pages_dashboardOps" */))
-const _366d5331 = () => interopDefault(import('..\\pages\\data.vue' /* webpackChunkName: "pages_data" */))
-const _490bed72 = () => interopDefault(import('..\\pages\\login.vue' /* webpackChunkName: "pages_login" */))
-const _0fb379ae = () => interopDefault(import('..\\pages\\organizations.vue' /* webpackChunkName: "pages_organizations" */))
-const _4155de2a = () => interopDefault(import('..\\pages\\register.vue' /* webpackChunkName: "pages_register" */))
-const _18b4fc88 = () => interopDefault(import('..\\pages\\reports.vue' /* webpackChunkName: "pages_reports" */))
-const _720ca8ac = () => interopDefault(import('..\\pages\\settings.vue' /* webpackChunkName: "pages_settings" */))
-const _a08fc610 = () => interopDefault(import('..\\pages\\admin\\organizations.vue' /* webpackChunkName: "pages_admin_organizations" */))
-const _42a23d60 = () => interopDefault(import('..\\pages\\admin\\users.vue' /* webpackChunkName: "pages_admin_users" */))
-const _7f644a5b = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages_index" */))
+const _2416eb9e = () => interopDefault(import('..\\pages\\boxesAssignment.vue' /* webpackChunkName: "pages_boxesAssignment" */))
+const _e84386c2 = () => interopDefault(import('..\\pages\\dashboard.vue' /* webpackChunkName: "pages_dashboard" */))
+const _1ffdfeba = () => interopDefault(import('..\\pages\\dashboard2.vue' /* webpackChunkName: "pages_dashboard2" */))
+const _622db4c3 = () => interopDefault(import('..\\pages\\dashboardOps.vue' /* webpackChunkName: "pages_dashboardOps" */))
+const _1e875022 = () => interopDefault(import('..\\pages\\data.vue' /* webpackChunkName: "pages_data" */))
+const _4ec4ff18 = () => interopDefault(import('..\\pages\\login.vue' /* webpackChunkName: "pages_login" */))
+const _4a0497aa = () => interopDefault(import('..\\pages\\organizations.vue' /* webpackChunkName: "pages_organizations" */))
+const _7ef853e8 = () => interopDefault(import('..\\pages\\register.vue' /* webpackChunkName: "pages_register" */))
+const _0a2dd70a = () => interopDefault(import('..\\pages\\reports.vue' /* webpackChunkName: "pages_reports" */))
+const _049c2168 = () => interopDefault(import('..\\pages\\settings.vue' /* webpackChunkName: "pages_settings" */))
+const _7191e5b6 = () => interopDefault(import('..\\pages\\admin\\organizations.vue' /* webpackChunkName: "pages_admin_organizations" */))
+const _5a77a41e = () => interopDefault(import('..\\pages\\admin\\users.vue' /* webpackChunkName: "pages_admin_users" */))
+const _0ef5dd5d = () => interopDefault(import('..\\pages\\index.vue' /* webpackChunkName: "pages_index" */))
 
 // TODO: remove in Nuxt 3
 const emptyFn = () => {}
@@ -35,55 +35,55 @@ export const routerOptions = {
 
   routes: [{
     path: "/boxesAssignment",
-    component: _633551af,
+    component: _2416eb9e,
     name: "boxesAssignment"
   }, {
     path: "/dashboard",
-    component: _1531fa9d,
+    component: _e84386c2,
     name: "dashboard"
   }, {
     path: "/dashboard2",
-    component: _ddb5fb36,
+    component: _1ffdfeba,
     name: "dashboard2"
   }, {
     path: "/dashboardOps",
-    component: _4a584e05,
+    component: _622db4c3,
     name: "dashboardOps"
   }, {
     path: "/data",
-    component: _366d5331,
+    component: _1e875022,
     name: "data"
   }, {
     path: "/login",
-    component: _490bed72,
+    component: _4ec4ff18,
     name: "login"
   }, {
     path: "/organizations",
-    component: _0fb379ae,
+    component: _4a0497aa,
     name: "organizations"
   }, {
     path: "/register",
-    component: _4155de2a,
+    component: _7ef853e8,
     name: "register"
   }, {
     path: "/reports",
-    component: _18b4fc88,
+    component: _0a2dd70a,
     name: "reports"
   }, {
     path: "/settings",
-    component: _720ca8ac,
+    component: _049c2168,
     name: "settings"
   }, {
     path: "/admin/organizations",
-    component: _a08fc610,
+    component: _7191e5b6,
     name: "admin-organizations"
   }, {
     path: "/admin/users",
-    component: _42a23d60,
+    component: _5a77a41e,
     name: "admin-users"
   }, {
     path: "/",
-    component: _7f644a5b,
+    component: _0ef5dd5d,
     name: "index"
   }],
 

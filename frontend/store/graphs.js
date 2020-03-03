@@ -142,38 +142,71 @@ export const actions = {
         let endLYP = minOne(endP - 13)
         let startLYP = minOne(startP - 13)
 
-        let [actualsDataCY, actualsDataLY, selectorData] = await Promise.all([
-            client.request(`query {
-                graphFiveCOGS(
-                    location: "${params.location}",
-                    locationId: ${params.locationId}, 
-                    isParent: ${params.isParent},
-                    selector: "actuals",
-                    startP: ${startP},
-                    endP: ${endP}
-                )
-            }`),
-            client.request(`query {
-                graphFiveCOGS(
-                    location: "${params.location}",
-                    locationId: ${params.locationId}, 
-                    isParent: ${params.isParent},
-                    selector: "actuals",
-                    startP: ${startLYP},
-                    endP: ${endLYP}
-                )
-            }`),
-            client.request(`query {
-                graphFiveCOGS(
-                    location: "${params.location}",
-                    locationId: ${params.locationId}, 
-                    isParent: ${params.isParent},
-                    selector: "${params.selector}",
-                    startP: ${startP},
-                    endP: ${endP}
-                )
-            }`)
-        ])
+        let actualsDataCY = await client.request(`query {
+            graphFiveCOGS(
+                location: "${params.location}",
+                locationId: ${params.locationId}, 
+                isParent: ${params.isParent},
+                startP: ${startP},
+                endP: ${endP},
+                selector: "actuals"
+            )
+        }`);
+
+        let actualsDataLY = await client.request(`query {
+            graphFiveCOGS(
+                location: "${params.location}",
+                locationId: ${params.locationId}, 
+                isParent: ${params.isParent},
+                startP: ${startLYP},
+                endP: ${endLYP},
+                selector: "actuals"
+            )
+        }`);
+
+        let selectorData = await client.request(`query {
+            graphFiveCOGS(
+                location: "${params.location}",
+                locationId: ${params.locationId}, 
+                isParent: ${params.isParent},
+                selector: "${params.selector}",
+                startP: ${startP},
+                endP: ${endP}
+            )
+        }`);
+
+        // let [actualsDataCY, actualsDataLY, selectorData] = await Promise.all([
+        //     client.request(`query {
+        //         graphFiveCOGS(
+        //             location: "${params.location}",
+        //             locationId: ${params.locationId}, 
+        //             isParent: ${params.isParent},
+        //             startP: ${startP},
+        //             endP: ${endP},
+        //             selector: "actuals"
+        //         )
+        //     }`),
+        //     client.request(`query {
+        //         graphFiveCOGS(
+        //             location: "${params.location}",
+        //             locationId: ${params.locationId}, 
+        //             isParent: ${params.isParent},
+        //             startP: ${startLYP},
+        //             endP: ${endLYP},
+        //             selector: "actuals"
+        //         )
+        //     }`),
+        //     client.request(`query {
+        //         graphFiveCOGS(
+        //             location: "${params.location}",
+        //             locationId: ${params.locationId}, 
+        //             isParent: ${params.isParent},
+        //             selector: "${params.selector}",
+        //             startP: ${startP},
+        //             endP: ${endP}
+        //         )
+        //     }`)
+        // ])
 
         return {
             actualsCYCOGS: padZero(actualsDataCY.graphFiveCOGS),
