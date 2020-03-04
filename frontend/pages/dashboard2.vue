@@ -643,6 +643,7 @@ export default {
       ];
     },
     source(product) {
+      console.log("cgs", this.CGS);
       let total = 0;
       this.CGS[product].forEach(row => (total += row.cgs));
       let avg = total / this.CGS[product].length;

@@ -676,7 +676,7 @@ export default {
       }
       return roots;
     },
-    
+
     async selectLocation(node) {
       this.location = node;
       await this.loadSalesForMiddleBoxes();
@@ -718,7 +718,6 @@ export default {
     },
 
     async loadSalesForMonth() {
-      
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
         {
@@ -730,11 +729,17 @@ export default {
         }
       );
 
+      console.log("sales", sales);
+
       sales.forEach(sale => {
         if (sale.category === "totalsales") {
           if (sale.target.toLowerCase() === "actuals") {
             this.totalSalesTable[sale.rankInCategory - 2].actual += sale.amount;
-          } else;
+            if (sale.rankInCategory == 2) {
+              console.log("sale amount", sale.amount);
+              this.totalSalesTable[sale.rankInCategory - 2].actual
+            }
+          } else
           this.totalSalesTable[sale.rankInCategory - 2].goal += sale.amount;
         } else if (sale.category === "opex") {
           if (sale.target.toLowerCase() === "actuals") {
@@ -751,6 +756,7 @@ export default {
               : 0
         };
       });
+      console.log("totalSales", this.totalSalesTable);
       this.opexTable = this.opexTable.map(item => {
         return {
           ...item,
@@ -784,8 +790,6 @@ export default {
         locationId: this.location.id,
         isParent: this.location.acct_type === "parent"
       });
-
-
     },
 
     async calculatePriorYearSales() {
@@ -832,47 +836,46 @@ export default {
     initTopBoxes() {
       this.totalSales = "0";
       this.lastYearSales = "0";
-      this.foodbev = {
+      (this.foodbev = {
         sales_actual: null,
         sales_target: null,
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
         cgs_target: null
-      },
-      this.beer = {
-        sales_actual: null,
-        sales_target: null,
-        purchase_actual: null,
-        purchase_target: null,
-        cgs_actual: null,
-        cgs_target: null
-      },
-
-      this.liquor = {
-        sales_actual: null,
-        sales_target: null,
-        purchase_actual: null,
-        purchase_target: null,
-        cgs_actual: null,
-        cgs_target: null
-      },
-      this.wine = {
-        sales_actual: null,
-        sales_target: null,
-        purchase_actual: null,
-        purchase_target: null,
-        cgs_actual: null,
-        cgs_target: null
-      },
-      this.apparel = {
-        sales_actual: null,
-        sales_target: null,
-        purchase_actual: null,
-        purchase_target: null,
-        cgs_actual: null,
-        cgs_target: null
-      }
+      }),
+        (this.beer = {
+          sales_actual: null,
+          sales_target: null,
+          purchase_actual: null,
+          purchase_target: null,
+          cgs_actual: null,
+          cgs_target: null
+        }),
+        (this.liquor = {
+          sales_actual: null,
+          sales_target: null,
+          purchase_actual: null,
+          purchase_target: null,
+          cgs_actual: null,
+          cgs_target: null
+        }),
+        (this.wine = {
+          sales_actual: null,
+          sales_target: null,
+          purchase_actual: null,
+          purchase_target: null,
+          cgs_actual: null,
+          cgs_target: null
+        }),
+        (this.apparel = {
+          sales_actual: null,
+          sales_target: null,
+          purchase_actual: null,
+          purchase_target: null,
+          cgs_actual: null,
+          cgs_target: null
+        });
     },
 
     initMiddleBoxTables() {
@@ -946,22 +949,20 @@ export default {
           percentageOfGoal: 0
         }
       ];
-    }
+    },
+
+    
   },
   async mounted() {
     this.initTopBoxes();
     this.initMiddleBoxTables();
-
     this.dateRange = getCurrentWeekDays();
     let init = await this.$store.dispatch("graphs/periodReverse", new Date());
     this.currentPeriod = init;
     this.periodNum = init;
-
     this.period = await this.$store.dispatch("graphs/period", this.periodNum);
     this.month = new Date("01 " + this.period.month + " " + this.period.year);
-
     this.locations = await this.$store.dispatch("graphs/locations");
-
     this.locationEntries = JSON.parse(
       JSON.stringify(
         this.convertToTree(
@@ -974,11 +975,8 @@ export default {
         )
       )
     );
-
     this.location = this.locationEntries[0];
-
     await this.loadSalesForMiddleBoxes();
-
     await this.loadSalesForTopBoxes();
   }
 };
@@ -1009,7 +1007,7 @@ export default {
   @media (max-width: 768px) {
     flex-direction: column;
   }
-  
+
   &:last-child {
     margin-bottom: 0;
   }

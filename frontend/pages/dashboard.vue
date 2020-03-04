@@ -437,18 +437,23 @@ export default {
     },
 
     async locationChanged(node) {
-        this.location = node;
-        await this.loadGraphs();
+      this.location = node;
+      await this.loadGraphs();
     },
 
     async loadGraphs() {
-      return Promise.all([
-        this.loadGraph1(),
+      this.loadGraph1(),
         this.loadGraph1Totals(),
         this.loadGraph2(),
         this.loadGraph5(),
         this.loadgraphSixIndividual()
-      ]);
+      // return Promise.all([
+      //   this.loadGraph1(),
+      //   this.loadGraph1Totals(),
+      //   this.loadGraph2(),
+      //   this.loadGraph5(),
+      //   this.loadgraphSixIndividual()
+      // ]);
     },
     async loadGraph1() {
       this.g1loaded = false;
@@ -541,8 +546,6 @@ export default {
         period: this.periodNum
       });
 
-      console.log("g2data", g2data);
-
       this.revenueAccounts = this.accounts(g2data);
       this.g2loaded = true;
     },
@@ -594,18 +597,12 @@ export default {
 
     accounts(d) {
       let r = [];
-      d.forEach(e => {
-        const index = r.findIndex(item => item.name === e.account.replace(/\d/g, "").trim());
-        if (index > -1 ) {
-          r[index].revenue += e.amount;
-        }
-        else 
+      d.forEach(e =>
         r.push({
           name: e.account.replace(/\d/g, "").trim(),
-          revenue: e.amount
+          revenue: this.intl.format(e.amount)
         })
-      });
-      r = r.map(item => ({...item, revenue: this.intl.format(item.revenue) }))
+      );
       return r;
     },
     title(text) {
@@ -672,8 +669,8 @@ export default {
 }
 
 .el-row {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: row;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
 }
 </style>
