@@ -114,6 +114,7 @@ return [
                 'periodReverse' => App\GraphQL\Query\PeriodReverseQuery::class,
                 'dashboardSalesForOps' => App\GraphQL\Query\DashboardSalesQuery::class,
                 'middleBoxForOps' => App\GraphQL\Query\MiddleBoxForOpsQuery::class,
+                'targetForOpsTopBox' => App\GraphQL\Query\TargetForOpsTopBoxQuery::class,
             ],
             'mutation' => [
                 'register' => App\GraphQL\Mutation\RegisterUserMutation::class,
@@ -154,7 +155,8 @@ return [
         'organization' => App\GraphQL\Types\OrganizationType::class,
         'accountRevenue' => App\GraphQL\Types\AccountRevenueType::class,
         'dashboardSalesForOps' => App\GraphQL\Types\DashboardSalesForOpsType::class,
-        'middleBoxForOps' => App\GraphQL\Types\MiddleBoxForOpsType::class
+        'middleBoxForOps' => App\GraphQL\Types\MiddleBoxForOpsType::class,
+        'targetForOpsTopBox' => App\GraphQL\Types\TargetForOpsTopBoxType::class
     ],
 
     // The types will be loaded on demand. Default is to load all types on each request

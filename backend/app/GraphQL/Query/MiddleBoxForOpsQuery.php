@@ -13,63 +13,63 @@ use App\GraphQL\Support\AuthenticatedQuery;
 
 class MiddleBoxForOpsQuery extends AuthenticatedQuery
 {
-    protected $attributes = [
-        'name' => 'MiddleBoxForOps'
+  protected $attributes = [
+    'name' => 'MiddleBoxForOps'
+  ];
+
+  public function type(): Type
+  {
+    return Type::listOf(GraphQL::type('middleBoxForOps'));
+  }
+
+  public function args(): array
+  {
+    return [
+      'location' => [
+        'name' => 'location',
+        'type' => Type::string()
+      ],
+      'period' => [
+        'name' => 'period',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'selector' => [
+        'name' => 'selector',
+        'type' => Type::nonNull(Type::string())
+      ],
+      'locationId' => [
+        'name' => 'locationId',
+        'type' => Type::nonNull(Type::int())
+      ],
+      'isParent' => [
+        'name' => 'isParent',
+        'type' => Type::nonNull(Type::boolean())
+      ],
     ];
+  }
 
-    public function type(): Type
-    {
-        return Type::listOf(GraphQL::type('middleBoxForOps'));
+  public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+  {
+    $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
+    $isParent = $args['isParent'];
+    $acctId = $args['locationId'];
+
+    $andLocation = '';
+    if ($location && $acctId) {
+      $andLocation = !$isParent ? "AND `Mid4Desc` = \"$location\"" :
+        "AND `Mid4Desc` IN (
+             SELECT `costcenter_tree`.`acct`
+            FROM `costcenter_tree`
+            JOIN `costcenter_descendants` ON `costcenter_descendants`.`descendant_id` = `costcenter_tree`.`acct_id`
+            WHERE `costcenter_descendants`.`costcenter_id` = $acctId
+          )";
     }
 
-    public function args(): array
-    {
-        return [
-            'location' => [
-                'name' => 'location',
-                'type' => Type::string()
-            ],
-            'period' => [
-                'name' => 'period',
-                'type' => Type::nonNull(Type::int())
-            ],
-            'selector' => [
-                'name' => 'selector',
-                'type' => Type::nonNull(Type::string())
-            ],
-            'locationId' => [
-              'name' => 'locationId',
-              'type' => Type::nonNull(Type::int())
-            ],
-            'isParent' => [
-              'name' => 'isParent',
-              'type' => Type::nonNull(Type::boolean())
-            ],
-        ];
-    }
+    $period = $args['period'];
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
-    {
-        $location = $args['location'] && strlen($args['location']) ? trim($args['location']) : '';
-        $isParent = $args['isParent'];
-        $acctId = $args['locationId'];
+    $selector = $args['selector'];
 
-        $andLocation = '';
-        if ($location && $acctId) {
-          $andLocation = !$isParent? "AND `Mid4Desc` = \"$location\"" : 
-          "AND `Mid4Desc` IN (SELECT acct
-          FROM (SELECT * FROM costcenter_tree
-          ORDER BY parent, acct_id) costcenter_tree_sorted,
-          (SELECT @pv := '$acctId') initialisation
-          WHERE FIND_IN_SET(parent, @pv)
-          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
-        }
-
-        $period = $args['period'];
-
-        $selector = $args['selector'];
-
-        $sql = <<<SQL
+    $sql = <<<SQL
             SELECT
             `category`, `FCSTDesc` AS `target`, `rank_in_category` AS `rankInCategory`, `P$period` AS `amount`
             FROM
@@ -79,7 +79,8 @@ class MiddleBoxForOpsQuery extends AuthenticatedQuery
                 $andLocation
             )
 SQL;
+    Log::info($sql);
 
-        return DB::connection('tenant')->select($sql);
-    }
+    return DB::connection('tenant')->select($sql);
+  }
 }

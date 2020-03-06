@@ -61,12 +61,12 @@ class GraphFiveCOGSQuery extends AuthenticatedQuery
     $andLocation = '';
     if ($location && $acctId) {
       $andLocation = !$isParent ? "AND `master_fcst_web`.`Mid4Desc` = \"$location\"" :
-        "AND `master_fcst_web`.`Mid4Desc` IN (SELECT acct
-          FROM (SELECT * FROM costcenter_tree
-          ORDER BY parent, acct_id) costcenter_tree_sorted,
-          (SELECT @pv := '$acctId') initialisation
-          WHERE FIND_IN_SET(parent, @pv)
-          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+        "AND `master_fcst_web`.`Mid4Desc` IN (
+          SELECT `costcenter_tree`.`acct`
+            FROM `costcenter_tree`
+            JOIN `costcenter_descendants` ON `costcenter_descendants`.`descendant_id` = `costcenter_tree`.`acct_id`
+            WHERE `costcenter_descendants`.`costcenter_id` = $acctId
+        )";
     }
 
     $groupBy = $location ? ", `master_fcst_web`.`Mid4Desc`" : '';
@@ -80,7 +80,7 @@ class GraphFiveCOGSQuery extends AuthenticatedQuery
         `master_fcst_web`.`FCSTDesc` AS `FCSTDesc`,
         `master_fcst_web`.`Mid4Desc` AS `Mid4Desc`,
 SQL;
-
+    
     for ($i = $startP; $i <= $endP; $i++) {
 
       $sql = $sql . "SUM(`master_fcst_web`.`P$i`) AS `P$i`" . (($i < $endP) ? ',' : '');
@@ -99,6 +99,8 @@ SQL;
         )
     GROUP BY `master_fcst_web`.`FCSTDesc` $groupBy
 SQL;
+
+Log::info($sql);
 
     if (!$isParent) {
       $row = DB::connection('tenant')->select($sql)[0];

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use Log;
 use App\User;
 use Exception;
 use App\Organization;
@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Eloquent\Collection;
+
 
 class MultiTenancyService {
 
@@ -163,6 +164,8 @@ class MultiTenancyService {
     protected function createTenantDatabase(string $dbName): bool
     {
         $newDB = DB::statement("CREATE DATABASE $dbName");
+
+
         return !!$newDB;
     }
 

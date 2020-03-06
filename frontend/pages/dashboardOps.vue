@@ -679,8 +679,9 @@ export default {
 
     async selectLocation(node) {
       this.location = node;
-      await this.loadSalesForMiddleBoxes();
-      await this.loadSalesForTopBoxes();
+      // await this.loadSalesForMiddleBoxes();
+      // await this.loadSalesForTopBoxes();
+      await this.loadTargetForTopBoxes();
     },
 
     convertCurrencySales(value) {
@@ -688,12 +689,14 @@ export default {
     },
 
     async periodChanged() {
+      console.log("this.month", this.month);
+      console.log("this.dateRange", this.dateRange);
       this.periodNum = await this.$store.dispatch(
         "graphs/periodReverse",
         this.month
       );
-      this.period = await this.$store.dispatch("graphs/period", this.periodNum);
-      await this.loadSalesForMiddleBoxes();
+      // this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+      // await this.loadSalesForMiddleBoxes();
     },
 
     async targetSelectorChanged() {
@@ -717,6 +720,23 @@ export default {
       return Promise.all([this.loadSalesForMonth()]);
     },
 
+    async loadTargetForTopBoxes() {
+      this.initTargetOnTopBox();
+      return Promise.all([this.loadTargetOnTopBox()]);
+    },
+
+    async loadTargetOnTopBox() {
+      let sales = await this.$store.dispatch(
+        "dashboardOps/getTargetForOpsTopBox",
+        {
+          location: this.location.label,
+          locationId: this.location.id,
+          isParent: this.location.acct_type === "parent",
+          period: this.periodNum,
+        }
+      );
+    },
+
     async loadSalesForMonth() {
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
@@ -729,18 +749,16 @@ export default {
         }
       );
 
-      console.log("sales", sales);
-
       sales.forEach(sale => {
         if (sale.category === "totalsales") {
           if (sale.target.toLowerCase() === "actuals") {
             this.totalSalesTable[sale.rankInCategory - 2].actual += sale.amount;
             if (sale.rankInCategory == 2) {
               console.log("sale amount", sale.amount);
-              this.totalSalesTable[sale.rankInCategory - 2].actual
+              this.totalSalesTable[sale.rankInCategory - 2].actual;
             }
           } else
-          this.totalSalesTable[sale.rankInCategory - 2].goal += sale.amount;
+            this.totalSalesTable[sale.rankInCategory - 2].goal += sale.amount;
         } else if (sale.category === "opex") {
           if (sale.target.toLowerCase() === "actuals") {
             this.opexTable[sale.rankInCategory - 1].actual += sale.amount;
@@ -877,6 +895,9 @@ export default {
           cgs_target: null
         });
     },
+    initTargetOnTopBox() {
+
+    },
 
     initMiddleBoxTables() {
       this.totalSalesTable = [
@@ -949,9 +970,7 @@ export default {
           percentageOfGoal: 0
         }
       ];
-    },
-
-    
+    }
   },
   async mounted() {
     this.initTopBoxes();
@@ -976,8 +995,10 @@ export default {
       )
     );
     this.location = this.locationEntries[0];
-    await this.loadSalesForMiddleBoxes();
-    await this.loadSalesForTopBoxes();
+
+    // await this.loadSalesForMiddleBoxes();
+    // await this.loadSalesForTopBoxes();
+    //await this.loadTargetForTopBoxes();
   }
 };
 

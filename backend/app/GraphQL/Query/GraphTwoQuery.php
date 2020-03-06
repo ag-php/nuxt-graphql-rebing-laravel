@@ -53,12 +53,12 @@ class GraphTwoQuery extends AuthenticatedQuery
         $andLocation = '';
         if ($location && $acctId) {
           $andLocation = !$isParent? "AND `master_fcst_layout_tbl`.`cc` = \"$location\"" : 
-          "AND `master_fcst_layout_tbl`.`cc` IN (SELECT acct
-          FROM (SELECT * FROM costcenter_tree
-          ORDER BY parent, acct_id) costcenter_tree_sorted,
-          (SELECT @pv := '$acctId') initialisation
-          WHERE FIND_IN_SET(parent, @pv)
-          AND LENGTH(@pv := CONCAT(@pv, ',', acct_id)))";
+          "AND `master_fcst_layout_tbl`.`cc` IN (
+             SELECT `costcenter_tree`.`acct`
+            FROM `costcenter_tree`
+            JOIN `costcenter_descendants` ON `costcenter_descendants`.`descendant_id` = `costcenter_tree`.`acct_id`
+            WHERE `costcenter_descendants`.`costcenter_id` = $acctId
+            )";
         }
 
         $groupBy = $location ? "`master_fcst_layout_tbl`.`cc` , " : "";
@@ -81,7 +81,23 @@ class GraphTwoQuery extends AuthenticatedQuery
     GROUP BY $groupBy
 SQL;
 
-Log::info($sql);
+if ($isParent) {
+  $sql = <<<SQL
+  SELECT `t1`.`cc`, `t1`.`acct`, SUM(`t1`.`amount`) as `amount` FROM (
+  SELECT
+      `master_fcst_layout_tbl`.`cc` AS `cc`,
+      `master_fcst_layout_tbl`.`acct` AS `acct`,
+      `master_fcst_actual`.`P$period` AS `amount`
+  FROM
+      (`master_fcst_actual`
+      LEFT JOIN `master_fcst_layout_tbl`
+      ON (((CONVERT( `master_fcst_layout_tbl`.`acct` USING UTF8) = `master_fcst_actual`.`AccountDesc`)
+      AND (CONVERT( `master_fcst_layout_tbl`.`cc` USING UTF8) = `master_fcst_actual`.`Mid4Desc`))))
+  WHERE
+      (`master_fcst_layout_tbl`.`Parent4` = 'Income' $andLocation)
+  GROUP BY $groupBy ) as `t1` GROUP BY `t1`.`acct`
+SQL;
+}
 
         $rows = DB::connection('tenant')->select($sql);
 

@@ -21,6 +21,23 @@ export const actions = {
         }`);
     return data.dashboardSalesForOps;
   },
+  async getTargetForOpsTopBox({ dispatch }, params) {
+    const client = await dispatch("user/gqlClient", true, { root: true });
+    const data = await client.request(`
+        query{
+          targetForOpsTopBox(
+              location: "${params.location}", 
+              locationId: ${params.locationId}, 
+              isParent: ${params.isParent}, 
+              period: ${params.period}, 
+            ) {
+                store
+                item
+                amount
+            }
+        }`);
+    return data.dashboardSalesForOps;
+  },
   async getSalesForMiddleBoxes({ dispatch }, params) {
     const client = await dispatch("user/gqlClient", true, { root: true });
     const data = await client.request(`

@@ -25,7 +25,7 @@ class MiddleBoxForOpsType extends GraphQLType
                 'description' => 'The target of the item',
             ],
             'rankInCategory' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::string()),
                 'description' => 'rank in category for the item',
             ],
             'amount' => [
