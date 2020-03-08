@@ -89,10 +89,11 @@ export default {
   watch: {
     salesData: {
       handler(val) {
+        console.log("val changed", val.target);
         this.total = 
           val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100/ val.sales_actual).toFixed(2) : 0
         ;
-        this.target = convertCurrencySales(val.cgs_target);
+        this.target = val.target;
         this.sales = convertCurrencySales(val.sales_actual);
         this.cgsTarget = convertCurrencySales(this.target * this.sales);
         this.purchase = convertCurrencySales(val.cgs_actual);
@@ -108,7 +109,7 @@ export default {
       cgsTarget: 0,
       purchase: 0,
       toSpend: 0,
-      target: 0
+      target: '0'
     };
   },
   methods: {

@@ -36,7 +36,7 @@ export const actions = {
                 amount
             }
         }`);
-    return data.dashboardSalesForOps;
+    return data.targetForOpsTopBox;
   },
   async getSalesForMiddleBoxes({ dispatch }, params) {
     const client = await dispatch("user/gqlClient", true, { root: true });

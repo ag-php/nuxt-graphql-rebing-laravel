@@ -379,7 +379,6 @@ export default {
         children: []
       },
       locations: [],
-      currentPeriod: 1,
       periodNum: 1,
       period: null,
       month: null,
@@ -396,7 +395,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       },
       beer: {
         sales_actual: null,
@@ -405,7 +405,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       },
 
       liquor: {
@@ -414,7 +415,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       },
       wine: {
         sales_actual: null,
@@ -422,7 +424,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       },
       apparel: {
         sales_actual: null,
@@ -430,7 +433,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       },
       totalSales: null,
       lastYearSales: null,
@@ -679,8 +683,8 @@ export default {
 
     async selectLocation(node) {
       this.location = node;
-      // await this.loadSalesForMiddleBoxes();
-      // await this.loadSalesForTopBoxes();
+      await this.loadSalesForMiddleBoxes();
+      await this.loadSalesForTopBoxes();
       await this.loadTargetForTopBoxes();
     },
 
@@ -689,8 +693,6 @@ export default {
     },
 
     async periodChanged() {
-      console.log("this.month", this.month);
-      console.log("this.dateRange", this.dateRange);
       this.periodNum = await this.$store.dispatch(
         "graphs/periodReverse",
         this.month
@@ -704,7 +706,18 @@ export default {
     },
 
     async dateRangeForTopBoxChanged() {
-      await this.loadSalesForTopBoxes();
+      console.log("changed");
+      this.periodNumForTarget = await this.$store.dispatch(
+        "graphs/periodReverse",
+        new Date(
+          this.dateRange[0].getFullYear(),
+          this.dateRange[0].getMonth(),
+          1
+        )
+      );
+
+      // await this.loadSalesForTopBoxes();
+      await this.loadTargetForTopBoxes();
     },
 
     async loadSalesForTopBoxes() {
@@ -732,9 +745,29 @@ export default {
           location: this.location.label,
           locationId: this.location.id,
           isParent: this.location.acct_type === "parent",
-          period: this.periodNum,
+          period: this.periodNumForTarget
         }
       );
+      console.log("sales", sales);
+
+      sales.map(sale => {
+        if (sale && sale.item) {
+          switch (sale.item) {
+            case "foodbevcgs":
+              this.foodbev.target = sale.amount.toFixed(2);
+              break;
+            case "beercgs":
+              this.beer.target = sale.amount.toFixed(2);
+              break;
+            case "liquorcgs":
+              this.liquor.target = sale.amount.toFixed(2);
+              break;
+            case "winecgs":
+              this.wine.target = sale.amount.toFixed(2);
+              break;
+          }
+        }
+      });
     },
 
     async loadSalesForMonth() {
@@ -754,7 +787,6 @@ export default {
           if (sale.target.toLowerCase() === "actuals") {
             this.totalSalesTable[sale.rankInCategory - 2].actual += sale.amount;
             if (sale.rankInCategory == 2) {
-              console.log("sale amount", sale.amount);
               this.totalSalesTable[sale.rankInCategory - 2].actual;
             }
           } else
@@ -774,7 +806,6 @@ export default {
               : 0
         };
       });
-      console.log("totalSales", this.totalSalesTable);
       this.opexTable = this.opexTable.map(item => {
         return {
           ...item,
@@ -860,7 +891,8 @@ export default {
         purchase_actual: null,
         purchase_target: null,
         cgs_actual: null,
-        cgs_target: null
+        cgs_target: null,
+        target: 0
       }),
         (this.beer = {
           sales_actual: null,
@@ -868,7 +900,8 @@ export default {
           purchase_actual: null,
           purchase_target: null,
           cgs_actual: null,
-          cgs_target: null
+          cgs_target: null,
+          target: 0
         }),
         (this.liquor = {
           sales_actual: null,
@@ -876,7 +909,8 @@ export default {
           purchase_actual: null,
           purchase_target: null,
           cgs_actual: null,
-          cgs_target: null
+          cgs_target: null,
+          target: 0
         }),
         (this.wine = {
           sales_actual: null,
@@ -884,7 +918,8 @@ export default {
           purchase_actual: null,
           purchase_target: null,
           cgs_actual: null,
-          cgs_target: null
+          cgs_target: null,
+          target: 0
         }),
         (this.apparel = {
           sales_actual: null,
@@ -892,11 +927,16 @@ export default {
           purchase_actual: null,
           purchase_target: null,
           cgs_actual: null,
-          cgs_target: null
+          cgs_target: null,
+          target: 0
         });
     },
     initTargetOnTopBox() {
-
+      this.foodbev.target = 0;
+      this.beer.target = 0;
+      this.liquor.target = 0;
+      this.wine.target = 0;
+      this.apparel.target = 0;
     },
 
     initMiddleBoxTables() {
@@ -977,10 +1017,15 @@ export default {
     this.initMiddleBoxTables();
     this.dateRange = getCurrentWeekDays();
     let init = await this.$store.dispatch("graphs/periodReverse", new Date());
-    this.currentPeriod = init;
     this.periodNum = init;
     this.period = await this.$store.dispatch("graphs/period", this.periodNum);
     this.month = new Date("01 " + this.period.month + " " + this.period.year);
+
+    this.periodNumForTarget = await this.$store.dispatch(
+      "graphs/periodReverse",
+      new Date(this.dateRange[0].getFullYear(), this.dateRange[0].getMonth(), 1)
+    );
+
     this.locations = await this.$store.dispatch("graphs/locations");
     this.locationEntries = JSON.parse(
       JSON.stringify(
@@ -998,7 +1043,7 @@ export default {
 
     // await this.loadSalesForMiddleBoxes();
     // await this.loadSalesForTopBoxes();
-    //await this.loadTargetForTopBoxes();
+    await this.loadTargetForTopBoxes();
   }
 };
 
