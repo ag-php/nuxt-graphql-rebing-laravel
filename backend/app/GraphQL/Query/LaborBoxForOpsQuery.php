@@ -11,15 +11,15 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use App\GraphQL\Support\AuthenticatedQuery;
 
-class MiddleBoxForOpsQuery extends AuthenticatedQuery
+class LaborBoxForOpsQuery extends AuthenticatedQuery
 {
   protected $attributes = [
-    'name' => 'MiddleBoxForOps'
+    'name' => 'LaborBoxForOps'
   ];
 
   public function type(): Type
   {
-    return Type::listOf(GraphQL::type('middleBoxForOps'));
+    return Type::listOf(GraphQL::type('laborBoxForOps'));
   }
 
   public function args(): array
@@ -71,15 +71,32 @@ class MiddleBoxForOpsQuery extends AuthenticatedQuery
 
     $sql = <<<SQL
             SELECT
-            `category`, `FCSTDesc` AS `target`, `rank_in_category` AS `rankInCategory`, `P$period` AS `amount`
+            `FCSTDesc` AS `target`, `itemdescription` AS `itemDescription`, `P$period` AS `amount`
             FROM
                 (`ops_dashboard_monthly`)
             WHERE (
-                (`FCSTDesc` = "$selector" OR `FCSTDesc` = "actuals") 
-                AND (`category` = 'totalsales' OR `category` = 'opex')
+                (`FCSTDesc` = "actuals") 
+                AND `category` = 'metrics'
                 $andLocation
             )
 SQL;
+
+    if ($isParent) {
+      $sql = <<<SQL
+        SELECT `t1`.`target`, `t1`.`itemDescription`,SUM(`t1`.`amount`) AS `amount` FROM(
+          SELECT  `FCSTDesc` AS `target`, `itemdescription` AS `itemDescription`, `P$period` AS `amount`
+          FROM
+              (`ops_dashboard_monthly`)
+          WHERE (
+            (`FCSTDesc` = "actuals" ) 
+            AND `category` = 'metrics'
+            $andLocation
+          )
+        ) AS `t1` GROUP BY `t1`.`itemDescription`, `t1`.`target`
+SQL;
+    }
+
+    Log::info($sql);
 
     return DB::connection('tenant')->select($sql);
   }

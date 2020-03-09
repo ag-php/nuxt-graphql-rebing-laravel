@@ -92,8 +92,6 @@ if ($isParent) {
 SQL;
 }
 
-Log::info($sql);
-
     return DB::connection('tenant')->select($sql);
   }
 }

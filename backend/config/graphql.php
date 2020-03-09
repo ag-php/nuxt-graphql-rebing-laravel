@@ -114,6 +114,7 @@ return [
                 'periodReverse' => App\GraphQL\Query\PeriodReverseQuery::class,
                 'dashboardSalesForOps' => App\GraphQL\Query\DashboardSalesQuery::class,
                 'middleBoxForOps' => App\GraphQL\Query\MiddleBoxForOpsQuery::class,
+                'laborBoxForOps' => App\GraphQL\Query\LaborBoxForOpsQuery::class,
                 'targetForOpsTopBox' => App\GraphQL\Query\TargetForOpsTopBoxQuery::class,
             ],
             'mutation' => [
@@ -156,6 +157,7 @@ return [
         'accountRevenue' => App\GraphQL\Types\AccountRevenueType::class,
         'dashboardSalesForOps' => App\GraphQL\Types\DashboardSalesForOpsType::class,
         'middleBoxForOps' => App\GraphQL\Types\MiddleBoxForOpsType::class,
+        'laborBoxForOps' => App\GraphQL\Types\LaborBoxForOpsType::class,
         'targetForOpsTopBox' => App\GraphQL\Types\TargetForOpsTopBoxType::class
     ],
 

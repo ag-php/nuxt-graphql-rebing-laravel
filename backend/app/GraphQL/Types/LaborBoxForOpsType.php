@@ -5,28 +5,23 @@ namespace App\GraphQL\Types;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class MiddleBoxForOpsType extends GraphQLType
+class LaborBoxForOpsType extends GraphQLType
 {
     protected $attributes = [
-        'name'          => 'laborBoxForOps',
-        'description'   => 'data for labor box in  the middle',
+        'name'          => 'LaborBoxForOps',
+        'description'   => 'data for middle box',
     ];
 
     public function fields(): array
     {
         return [
-            'category' => [
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'The name of the category',
-            ]
-            ,
             'target' => [
                 'type' => Type::nonNull(Type::string()),
                 'description' => 'The target of the item',
             ],
-            'rankInCategory' => [
+            'itemDescription' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'rank in category for the item',
+                'description' => 'item description',
             ],
             'amount' => [
                 'type' =>  Type::float(),

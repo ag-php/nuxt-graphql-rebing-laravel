@@ -56,5 +56,24 @@ export const actions = {
             }
         }`);
     return data.middleBoxForOps;
+  },
+
+  async getDataForLaborBox({ dispatch }, params) {
+    const client = await dispatch("user/gqlClient", true, { root: true });
+    const data = await client.request(`
+        query {
+          laborBoxForOps(
+              location: "${params.location}", 
+              locationId: ${params.locationId}, 
+              isParent: ${params.isParent}, 
+              period: ${params.period}, 
+              selector: "${params.selector}"
+            ) {
+                target
+                itemDescription
+                amount
+            }
+        }`);
+    return data.laborBoxForOps;
   }
 };

@@ -15,7 +15,13 @@
           :key="i"
           v-bind:class="{ 'mb-4': $device.isMobile }"
         >
-          <box-with-title-box :boxTheme="topBox.boxTheme">
+          <box-with-title-box
+            :boxTheme="topBox.boxTheme"
+            v-loading="
+              (i == 1 && loadingTotalCurrentYear) ||
+                (i == 2 && loadingTotalLastYear)
+            "
+          >
             <template v-slot:header>
               <span>{{ topBox.titleText }}</span>
             </template>
@@ -52,6 +58,7 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
+            v-loading="loadingTopBoxes"
             boxTheme="blue"
             :salesData="foodbev"
             title="FOOD"
@@ -68,6 +75,7 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
+            v-loading="loadingTopBoxes"
             boxTheme="white"
             :salesData="beer"
             title="BEER"
@@ -84,6 +92,7 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
+            v-loading="loadingTopBoxes"
             boxTheme="blue"
             :salesData="liquor"
             title="LIQUOR"
@@ -100,6 +109,7 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
+            v-loading="loadingTopBoxes"
             boxTheme="white"
             :salesData="wine"
             title="WINE"
@@ -116,6 +126,7 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
+            v-loading="loadingTopBoxes"
             boxTheme="green"
           ></box-with-header-and-footer>
         </el-col>
@@ -172,7 +183,7 @@
               ></el-option>
             </el-select>
           </el-col>
-          <el-col :sm="24" :md="14">
+          <el-col :sm="24" :md="14" v-loading="loadingMiddleTables">
             <box-with-border>
               <template v-slot:header>
                 <span>SALES</span>
@@ -227,10 +238,10 @@
         </el-row>
       </el-col>
 
-      <el-col :sm="24" :md="12" :lg="8">
+      <el-col :sm="24" :md="12" :lg="8" v-loading="loadingLaborBoxes">
         <box-with-border :hasBorderForContent="false">
           <template v-slot:header>
-            <span>LABOR 32.87%</span>
+            <span>LABOR {{ labor }}%</span>
           </template>
           <template v-slot:content>
             <el-row
@@ -245,7 +256,7 @@
                     <span>MANAGEMENT</span>
                   </template>
                   <template v-slot:content>
-                    <span>9.93%</span>
+                    <span>{{ management }}%</span>
                   </template>
                 </box-with-title-box>
               </el-col>
@@ -259,20 +270,20 @@
               <el-col :span="11">
                 <box-with-title-box boxTheme="green-black medium-content">
                   <template v-slot:header>
-                    <span>MANAGEMENT</span>
+                    <span>FOH</span>
                   </template>
                   <template v-slot:content>
-                    <span>9.93%</span>
+                    <span>{{ fOH }}%</span>
                   </template>
                 </box-with-title-box>
               </el-col>
               <el-col :span="11">
                 <box-with-title-box boxTheme="green-black medium-content">
                   <template v-slot:header>
-                    <span>MANAGEMENT</span>
+                    <span>BOH</span>
                   </template>
                   <template v-slot:content>
-                    <span>9.93%</span>
+                    <span>{{ bOH }}%</span>
                   </template>
                 </box-with-title-box>
               </el-col>
@@ -281,7 +292,7 @@
         </box-with-border>
       </el-col>
 
-      <el-col :sm="24" :md="12" :lg="6">
+      <el-col :sm="24" :md="12" :lg="6" v-loading="loadingMiddleTables">
         <el-row type="flex" justify="center">
           <el-col :span="24">
             <box-with-border>
@@ -342,7 +353,7 @@
             <span>{{ bottomBox.titleText }}</span>
           </template>
           <template v-slot:content>
-            <span>{{ bottomBox.contentText }}</span>
+            <span>{{ bottomBox.contentText }}%</span>
           </template>
         </box-with-title-box>
       </el-col>
@@ -387,8 +398,23 @@ export default {
           return date > new Date() || date < new Date("01/01/2018");
         }
       },
+      loadingTotalCurrentYear: false,
+      loadingTotalLastYear: false,
+      loadingTopBoxes: false,
+      loadingMiddleTables: false,
+      loadingLaborBoxes: false,
+      loadingBottomBoxes: false,
+
       selectorOptions: ["Budget", "Q2 Forecast", "Q3 Forecast", "Q4 Forecast"],
       targetSelector: "Budget",
+      labor: "0",
+      management: "0",
+      fOH: "0",
+      bOH: "0",
+      grossMargin: "0",
+      iFO: "0",
+      netIncome: "0",
+      discounts: "0",
       foodbev: {
         sales_actual: null,
         sales_target: null,
@@ -513,98 +539,50 @@ export default {
         {
           id: 1,
           titleText: "GROSS MARGIN",
-          contentText: "41.7%",
+          contentText: this.grossMargin,
           boxTheme: "green-dark-green large-content"
         },
         {
           id: 2,
           titleText: "IFO",
-          contentText: "27.6%",
+          contentText: this.iFO,
           boxTheme: "green-dark-green large-content"
         },
         {
           id: 3,
           titleText: "NET INCOME",
-          contentText: "14.4%",
+          contentText: this.netIncome,
           boxTheme: "green-dark-green large-content"
         },
         {
           id: 4,
           titleText: "DISCOUNTS",
-          contentText: "3.19%",
+          contentText: this.discounts,
           boxTheme: "green-dark-green large-content"
         }
       ],
-      totalSalesTable: [
-        {
-          category: "Food",
+      totalSalesTable: ["Food", "Beer", "Liquor", "Wine", "Other"].map(
+        item => ({
+          category: item,
           actual: 0,
           goal: 0,
           percentageOfGoal: 0
-        },
-        {
-          category: "Beer",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Liquor",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Wine",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Other",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        }
-      ],
+        })
+      ),
       opexTable: [
-        {
-          category: "Restaurant Supplies",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Restaurant Expenses",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Facility Expenses",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Administration",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Advertising",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Occupancy",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        }
-      ],
+        "Restaurant Supplies",
+        "Restaurant Expenses",
+        "Facility Expenses",
+        "Administration",
+        "Advertising",
+        "Occupancy"
+      ].map(item => ({
+        category: item,
+        actual: 0,
+        goal: 0,
+        percentageOfGoal: 0
+      })),
+
       allSales: []
     };
   },
@@ -658,6 +636,22 @@ export default {
 
     lastYearSales: function(newValue) {
       this.topBoxes[2].contentText = convertCurrencySales(newValue);
+    },
+
+    grossMargin: function(newValue) {
+      this.bottomBoxes[0].contentText = newValue;
+    },
+
+    iFO: function(newValue) {
+      this.bottomBoxes[1].contentText = newValue;
+    },
+
+    netIncome: function(newValue) {
+      this.bottomBoxes[2].contentText = newValue;
+    },
+
+    discounts: function(newValue) {
+      this.bottomBoxes[3].contentText = newValue;
     }
   },
   methods: {
@@ -697,8 +691,8 @@ export default {
         "graphs/periodReverse",
         this.month
       );
-      // this.period = await this.$store.dispatch("graphs/period", this.periodNum);
-      // await this.loadSalesForMiddleBoxes();
+      this.period = await this.$store.dispatch("graphs/period", this.periodNum);
+      await this.loadSalesForMiddleBoxes();
     },
 
     async targetSelectorChanged() {
@@ -706,7 +700,6 @@ export default {
     },
 
     async dateRangeForTopBoxChanged() {
-      console.log("changed");
       this.periodNumForTarget = await this.$store.dispatch(
         "graphs/periodReverse",
         new Date(
@@ -716,7 +709,7 @@ export default {
         )
       );
 
-      // await this.loadSalesForTopBoxes();
+      await this.loadSalesForTopBoxes();
       await this.loadTargetForTopBoxes();
     },
 
@@ -730,7 +723,11 @@ export default {
 
     async loadSalesForMiddleBoxes() {
       this.initMiddleBoxTables();
-      return Promise.all([this.loadSalesForMonth()]);
+      this.initBottomBoxTables();
+      return Promise.all([
+        this.loadSalesForTables(),
+        this.loadDataForLaborBoxes()
+      ]);
     },
 
     async loadTargetForTopBoxes() {
@@ -748,7 +745,6 @@ export default {
           period: this.periodNumForTarget
         }
       );
-      console.log("sales", sales);
 
       sales.map(sale => {
         if (sale && sale.item) {
@@ -770,7 +766,8 @@ export default {
       });
     },
 
-    async loadSalesForMonth() {
+    async loadSalesForTables() {
+      this.loadingMiddleTables = true;
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
         {
@@ -815,6 +812,113 @@ export default {
               : 0
         };
       });
+      this.loadingMiddleTables = false;
+    },
+
+    async loadDataForLaborBoxes() {
+      this.loadingMiddleTables = true;
+      let data = await this.$store.dispatch("dashboardOps/getDataForLaborBox", {
+        location: this.location.label,
+        locationId: this.location.id,
+        isParent: this.location.acct_type === "parent",
+        period: this.periodNum,
+        selector: this.targetSelector
+      });
+
+      let income = data.find(
+        item => item.itemDescription.toLowerCase() === "income"
+      );
+
+      if (income && income.amount) {
+        if (
+          data.find(item => item.itemDescription.toLowerCase() === "labor") !==
+          undefined
+        )
+          this.labor = (
+            (data.find(item => item.itemDescription.toLowerCase() === "labor")
+              .amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(
+            item => item.itemDescription.toLowerCase() === "management"
+          ) !== undefined
+        )
+          this.management = (
+            (data.find(
+              item => item.itemDescription.toLowerCase() === "management"
+            ).amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(item => item.itemDescription.toLowerCase() === "boh") !==
+          undefined
+        )
+          this.bOH = (
+            (data.find(item => item.itemDescription.toLowerCase() === "boh")
+              .amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(item => item.itemDescription.toLowerCase() === "foh") !==
+          undefined
+        )
+          this.fOH = (
+            (data.find(item => item.itemDescription.toLowerCase() === "foh")
+              .amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+
+        if (
+          data.find(
+            item => item.itemDescription.toLowerCase() === "gross_margin"
+          ) !== undefined
+        )
+          this.grossMargin = (
+            (data.find(
+              item => item.itemDescription.toLowerCase() === "gross_margin"
+            ).amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(item => item.itemDescription.toLowerCase() === "ifo") !==
+          undefined
+        )
+          this.iFO = (
+            (data.find(item => item.itemDescription.toLowerCase() === "ifo")
+              .amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(item => item.itemDescription.toLowerCase() === "ni") !==
+          undefined
+        )
+          this.netIncome = (
+            (data.find(item => item.itemDescription.toLowerCase() === "ni")
+              .amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+        if (
+          data.find(
+            item => item.itemDescription.toLowerCase() === "discounts"
+          ) !== undefined
+        )
+          this.discounts = (
+            (data.find(
+              item => item.itemDescription.toLowerCase() === "discounts"
+            ).amount *
+              100) /
+            income.amount
+          ).toFixed(2);
+      }
+      this.loadingMiddleTables = false;
     },
 
     async calculateAllSales() {
@@ -832,6 +936,8 @@ export default {
         .toISOString()
         .slice(0, 10);
 
+      this.loadingTotalCurrentYear = true;
+      this.loadingTopBoxes = true;
       this.allSales = await this.$store.dispatch("dashboardOps/getAllSales", {
         start: start,
         end: end,
@@ -839,6 +945,8 @@ export default {
         locationId: this.location.id,
         isParent: this.location.acct_type === "parent"
       });
+      this.loadingTotalCurrentYear = false;
+      this.loadingTopBoxes = false;
     },
 
     async calculatePriorYearSales() {
@@ -855,6 +963,8 @@ export default {
       )
         .toISOString()
         .slice(0, 10);
+
+      this.loadingTotalLastYear = true;
       let lastYearSalesData = await this.$store.dispatch(
         "dashboardOps/getAllSales",
         {
@@ -880,6 +990,7 @@ export default {
           return sum + sales.amount;
         } else return sum;
       }, 0);
+      this.loadingTotalLastYear = false;
     },
 
     initTopBoxes() {
@@ -940,81 +1051,45 @@ export default {
     },
 
     initMiddleBoxTables() {
-      this.totalSalesTable = [
-        {
-          category: "Food",
+      this.totalSalesTable = ["Food", "Beer", "Liquor", "Wine", "Other"].map(
+        item => ({
+          category: item,
           actual: 0,
           goal: 0,
           percentageOfGoal: 0
-        },
-        {
-          category: "Beer",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Liquor",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Wine",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Other",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        }
-      ];
+        })
+      );
+
       this.opexTable = [
-        {
-          category: "Restaurant Supplies",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Restaurant Expenses",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Facility Expenses",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Administration",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Advertising",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        },
-        {
-          category: "Occupancy",
-          actual: 0,
-          goal: 0,
-          percentageOfGoal: 0
-        }
-      ];
+        "Restaurant Supplies",
+        "Restaurant Expenses",
+        "Facility Expenses",
+        "Administration",
+        "Advertising",
+        "Occupancy"
+      ].map(item => ({
+        category: item,
+        actual: 0,
+        goal: 0,
+        percentageOfGoal: 0
+      }));
+
+      this.labor = "0";
+      this.management = "0";
+      this.bOH = "0";
+      this.fOH = "0";
+    },
+    initBottomBoxTables() {
+      this.grossMargin = "0";
+      this.iFO = "0";
+      this.netIncome = "0";
+      this.discounts = "0";
     }
   },
   async mounted() {
     this.initTopBoxes();
     this.initMiddleBoxTables();
+    this.initBottomBoxTables();
     this.dateRange = getCurrentWeekDays();
     let init = await this.$store.dispatch("graphs/periodReverse", new Date());
     this.periodNum = init;
@@ -1040,21 +1115,11 @@ export default {
       )
     );
     this.location = this.locationEntries[0];
-
-    // await this.loadSalesForMiddleBoxes();
-    // await this.loadSalesForTopBoxes();
+    await this.loadSalesForTopBoxes();
+    await this.loadSalesForMiddleBoxes();
     await this.loadTargetForTopBoxes();
   }
 };
-
-// let SalesType = {
-//   sales_actual: null,
-//   sales_target: null,
-//   purchase_actual: null,
-//   purchase_target: null,
-//   cgs_actual: null,
-//   cgs_target: null
-// }
 </script>
 
 <style scoped lang="scss">
@@ -1064,6 +1129,9 @@ export default {
 }
 .mb-4 {
   margin-bottom: 16px;
+}
+.spiner-topbox {
+  width: 100px;
 }
 .el-row {
   margin-bottom: 20px;

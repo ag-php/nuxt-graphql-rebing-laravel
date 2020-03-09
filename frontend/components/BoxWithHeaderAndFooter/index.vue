@@ -40,7 +40,7 @@
       </div>
     </div>
     <div class="footer">
-      <span>Target - ${{target}}</span>
+      <span>Target - {{target}}</span>
     </div>
   </div>
 </template>
@@ -89,7 +89,6 @@ export default {
   watch: {
     salesData: {
       handler(val) {
-        console.log("val changed", val.target);
         this.total = 
           val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100/ val.sales_actual).toFixed(2) : 0
         ;

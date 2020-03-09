@@ -43,6 +43,7 @@
 
       <div style="text-align:center" v-if="g1TotalsLoaded">
         <panel-group
+          v-loading="g1TotalsLoaded"
           label1="Total Revenue"
           :value1="totalRevenue"
           label2="Target Revenue"
@@ -442,18 +443,13 @@ export default {
     },
 
     async loadGraphs() {
-      this.loadGraph1(),
+      return Promise.all([
+        this.loadGraph1(),
         this.loadGraph1Totals(),
         this.loadGraph2(),
         this.loadGraph5(),
         this.loadgraphSixIndividual()
-      // return Promise.all([
-      //   this.loadGraph1(),
-      //   this.loadGraph1Totals(),
-      //   this.loadGraph2(),
-      //   this.loadGraph5(),
-      //   this.loadgraphSixIndividual()
-      // ]);
+      ]);
     },
     async loadGraph1() {
       this.g1loaded = false;
