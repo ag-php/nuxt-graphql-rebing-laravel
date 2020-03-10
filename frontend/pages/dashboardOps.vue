@@ -41,7 +41,7 @@
                   @change="dateRangeForTopBoxChanged"
                 ></el-date-picker>
               </div>
-              <span v-if="i != 0">${{ topBox.contentText }}</span>
+              <span v-if="i != 0" :style="{fontSize: '28px'}">${{ topBox.contentText }}</span>
             </template>
           </box-with-title-box>
         </el-col>

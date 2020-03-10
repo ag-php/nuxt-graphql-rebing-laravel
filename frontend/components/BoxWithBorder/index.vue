@@ -1,9 +1,9 @@
 <template>
   <div class="board-column" :class="boxTheme">
-    <div class="titie-box" :class="{'shorter-header': !hasBorderForContent}">
+    <div class="titie-box" :class="{ 'shorter-header': !hasBorderForContent }">
       <slot name="header"></slot>
     </div>
-    <div class="content" :class="{'with-border': hasBorderForContent}">
+    <div class="content" :class="{ 'with-border': hasBorderForContent }">
       <slot name="content"></slot>
     </div>
   </div>
@@ -67,7 +67,7 @@ export default {
     font-size: 8px !important;
     .el-table {
       font-size: 10px !important;
-      /deep/ .el-table__body{
+      /deep/ .el-table__body {
         height: 100%;
       }
       /deep/ td {
@@ -83,8 +83,10 @@ export default {
         align-items: center;
         text-align: center;
         word-break: normal;
-        
-        
+        font-size: 12px;
+        span {
+          font-size: 12px;
+        }
       }
       /deep/ tr {
         th {
