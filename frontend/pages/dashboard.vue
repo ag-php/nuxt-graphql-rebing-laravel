@@ -41,9 +41,8 @@
         </el-select>
       </el-row>
 
-      <div style="text-align:center" v-if="g1TotalsLoaded">
+      <div style="text-align:center" v-loading="!g1TotalsLoaded">
         <panel-group
-          v-loading="g1TotalsLoaded"
           label1="Total Revenue"
           :value1="totalRevenue"
           label2="Target Revenue"
@@ -51,10 +50,6 @@
           label3="Total Revenue (LY)"
           :value4="totalRevenueLY"
         />
-      </div>
-      <div v-else>
-        <img src="/spinner.gif" />
-        <br />
       </div>
 
       <br /><br />

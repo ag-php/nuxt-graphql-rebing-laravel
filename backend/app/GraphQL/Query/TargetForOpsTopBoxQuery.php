@@ -78,7 +78,7 @@ SQL;
 
 if ($isParent) {
   $sql = <<<SQL
-  SELECT `t1`.`store`, `t1`.`item`, SUM(`t1`.`amount`) as `amount` FROM (
+  SELECT `t1`.`store`, `t1`.`item`, AVG(`t1`.`amount`) as `amount` FROM (
     SELECT
         `drivers_rates`.`Store` AS `store`,
         `graph_setup_daily`.`dashboardref` AS `item`,

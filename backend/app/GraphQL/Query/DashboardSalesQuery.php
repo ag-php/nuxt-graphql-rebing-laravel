@@ -81,6 +81,7 @@ class DashboardSalesQuery extends AuthenticatedQuery
               GROUP BY `item`, `type`
 
 SQL;
+
     return DB::connection('tenant')->select($sql);
   }
 }

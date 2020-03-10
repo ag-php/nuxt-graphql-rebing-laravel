@@ -1,10 +1,12 @@
 <template>
   <div class="board-column" :class="boxTheme">
     <div class="header">
-      <span>{{title}} CGS {{total}}%</span>
+      <span v-if="!isTotal">{{title}} CGS {{total}}%</span>
+      <span v-else>TOTAL PRODUCT</span>
+
     </div>
-    <div class="content">
-      <div style="width: 100%;">
+    <div class="content" :class="{'is-total': isTotal}">
+      <div style="width: 100%;" v-if="!isTotal">
         <el-row>
           <el-col :span="14" style="text-align: right;">
             <p>Sales :</p>
@@ -34,13 +36,20 @@
             <p>To Spend :</p>
           </el-col>
           <el-col :span="10" style="text-align: left;">
-            <p>{{Number(toSpend) >= 0 ? '$' + Number(toSpend) : '-$' + Math.abs(Number(toSpend))}}</p>
+            <p>{{toSpend}}</p>
+          </el-col>
+        </el-row>
+      </div>
+      <div style="width: 100%;" v-else>
+        <el-row>
+          <el-col :span="24" style="text-align: center;">
+            <p>0%</p>
           </el-col>
         </el-row>
       </div>
     </div>
-    <div class="footer">
-      <span>Target - {{target}}</span>
+    <div class="footer" v-loading="loadingTarget">
+      <span>Target - {{target}}%</span>
     </div>
   </div>
 </template>
@@ -84,6 +93,14 @@ export default {
     footer: {
       type: String,
       default: "Content"
+    },
+    loadingTarget: {
+      type: Boolean,
+      default: false
+    },
+    isTotal: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -92,14 +109,16 @@ export default {
         this.total = 
           val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100/ val.sales_actual).toFixed(2) : 0
         ;
-        this.target = val.target;
+        this.target = (Number(val.target) * 100 ).toFixed(2);
         this.sales = convertCurrencySales(val.sales_actual);
-        this.cgsTarget = convertCurrencySales(this.target * this.sales);
+        this.cgsTarget = convertCurrencySales(Number(val.target) * val.sales_actual);
         this.purchase = convertCurrencySales(val.cgs_actual);
-        this.toSpend = convertCurrencySales(this.cgsTarget - this.purchase);
+        this.toSpend = (Number(val.target) * val.sales_actual - val.cgs_actual) >= 0 ?  
+        `$${convertCurrencySales(Number(val.target) * val.sales_actual - val.cgs_actual)}` :
+        `-$${convertCurrencySales(Math.abs(Number(val.target) * val.sales_actual - val.cgs_actual))}`
       },
       deep: true
-    }
+    },
   },
   data() {
     return {
@@ -153,6 +172,10 @@ export default {
     align-items: center;
     font-size: 12px;
     font-weight: 600;
+    &.is-total{
+      padding: 23px 0px;
+      font-size: 22px;
+    }
     @media (max-width: 1330px) {
       font-size: 0.85vw;
       font-weight: 600;
@@ -180,6 +203,10 @@ export default {
   &.green {
     background: #6eba5c;
     color: white;
+    .content {
+      
+      color: #6eba5c;
+    }
   }
 
   &.black {

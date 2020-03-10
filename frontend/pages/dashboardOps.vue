@@ -2,7 +2,15 @@
   <div>
     <h1>Ops Dashboard</h1>
     <br />
-    <div class="top-container">
+    <div
+      class="top-container"
+      v-loading="
+        loadingTotalCurrentYear ||
+          loadingTotalLastYear ||
+          loadingTopBoxes ||
+          loadingTarget
+      "
+    >
       <el-row
         class="row-bg top-container"
         justify="center"
@@ -15,13 +23,7 @@
           :key="i"
           v-bind:class="{ 'mb-4': $device.isMobile }"
         >
-          <box-with-title-box
-            :boxTheme="topBox.boxTheme"
-            v-loading="
-              (i == 1 && loadingTotalCurrentYear) ||
-                (i == 2 && loadingTotalLastYear)
-            "
-          >
+          <box-with-title-box :boxTheme="topBox.boxTheme">
             <template v-slot:header>
               <span>{{ topBox.titleText }}</span>
             </template>
@@ -41,7 +43,9 @@
                   @change="dateRangeForTopBoxChanged"
                 ></el-date-picker>
               </div>
-              <span v-if="i != 0" :style="{fontSize: '28px'}">${{ topBox.contentText }}</span>
+              <span v-if="i != 0" :style="{ fontSize: '28px' }"
+                >${{ topBox.contentText }}</span
+              >
             </template>
           </box-with-title-box>
         </el-col>
@@ -109,7 +113,6 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
-            v-loading="loadingTopBoxes"
             boxTheme="white"
             :salesData="wine"
             title="WINE"
@@ -126,8 +129,8 @@
           v-bind:class="{ 'mb-4 mx-4': $device.isMobile }"
         >
           <box-with-header-and-footer
-            v-loading="loadingTopBoxes"
             boxTheme="green"
+            :isTotal="true"
           ></box-with-header-and-footer>
         </el-col>
       </el-row>
@@ -198,18 +201,14 @@
                   <el-table-column
                     prop="category"
                     label
-                    :min-width="20"
+                    :min-width="19"
                   ></el-table-column>
-                  <el-table-column
-                    prop="actual"
-                    label="ACTUAL"
-                    :min-width="26.66"
-                  >
+                  <el-table-column prop="actual" label="ACTUAL" :min-width="27">
                     <template slot-scope="scope">
                       <span>${{ convertCurrencySales(scope.row.actual) }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="goal" label="GOAL" :min-width="26.66">
+                  <el-table-column prop="goal" label="GOAL" :min-width="27">
                     <template slot-scope="scope">
                       <span>{{
                         scope.row.goal >= 0
@@ -223,7 +222,7 @@
                   <el-table-column
                     prop="percentageOfGoal"
                     label="% of GOAL"
-                    :min-width="26.66"
+                    :min-width="27"
                   >
                     <template slot-scope="scope">
                       <span>{{
@@ -238,7 +237,7 @@
         </el-row>
       </el-col>
 
-      <el-col :sm="24" :md="12" :lg="8" v-loading="loadingLaborBoxes">
+      <el-col :sm="24" :md="12" :lg="8" v-loading="loadingBottomBoxes">
         <box-with-border :hasBorderForContent="false">
           <template v-slot:header>
             <span>LABOR {{ labor }}%</span>
@@ -304,14 +303,14 @@
                   <el-table-column
                     prop="category"
                     label
-                    :min-width="34"
+                    :min-width="37"
                   ></el-table-column>
-                  <el-table-column prop="actual" label="Actual" :min-width="22">
+                  <el-table-column prop="actual" label="Actual" :min-width="21">
                     <template slot-scope="scope">
                       <span>${{ convertCurrencySales(scope.row.actual) }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="goal" label="GOAL" :min-width="22">
+                  <el-table-column prop="goal" label="GOAL" :min-width="21">
                     <template slot-scope="scope">
                       <span>{{
                         scope.row.goal >= 0
@@ -324,7 +323,7 @@
                   <el-table-column
                     prop="percentageOfGoal"
                     label="% of GOAL"
-                    :min-width="22"
+                    :min-width="21"
                   >
                     <template slot-scope="scope">
                       <span>{{
@@ -340,7 +339,7 @@
       </el-col>
     </el-row>
 
-    <el-row class="row-bg" justify="center">
+    <el-row class="row-bg" justify="center" v-loading="loadingBottomBoxes">
       <el-col
         :sm="24"
         :md="8"
@@ -400,9 +399,9 @@ export default {
       },
       loadingTotalCurrentYear: false,
       loadingTotalLastYear: false,
+      loadingTarget: false,
       loadingTopBoxes: false,
       loadingMiddleTables: false,
-      loadingLaborBoxes: false,
       loadingBottomBoxes: false,
 
       selectorOptions: ["Budget", "Q2 Forecast", "Q3 Forecast", "Q4 Forecast"],
@@ -677,9 +676,11 @@ export default {
 
     async selectLocation(node) {
       this.location = node;
-      await this.loadSalesForMiddleBoxes();
-      await this.loadSalesForTopBoxes();
-      await this.loadTargetForTopBoxes();
+      return Promise.all([
+        this.loadSalesForMiddleBoxes(),
+        this.loadSalesForTopBoxes(),
+        this.loadTargetForTopBoxes()
+      ]);
     },
 
     convertCurrencySales(value) {
@@ -709,8 +710,10 @@ export default {
         )
       );
 
-      await this.loadSalesForTopBoxes();
-      await this.loadTargetForTopBoxes();
+      return Promise.all([
+        this.loadSalesForTopBoxes(),
+        this.loadTargetForTopBoxes()
+      ]);
     },
 
     async loadSalesForTopBoxes() {
@@ -722,8 +725,6 @@ export default {
     },
 
     async loadSalesForMiddleBoxes() {
-      this.initMiddleBoxTables();
-      this.initBottomBoxTables();
       return Promise.all([
         this.loadSalesForTables(),
         this.loadDataForLaborBoxes()
@@ -736,6 +737,7 @@ export default {
     },
 
     async loadTargetOnTopBox() {
+      this.loadingTarget = true;
       let sales = await this.$store.dispatch(
         "dashboardOps/getTargetForOpsTopBox",
         {
@@ -764,9 +766,11 @@ export default {
           }
         }
       });
+      this.loadingTarget = false;
     },
 
     async loadSalesForTables() {
+      this.initMiddleBoxTables();
       this.loadingMiddleTables = true;
       let sales = await this.$store.dispatch(
         "dashboardOps/getSalesForMiddleBoxes",
@@ -778,6 +782,8 @@ export default {
           selector: this.targetSelector
         }
       );
+
+      console.log("sales", sales);
 
       sales.forEach(sale => {
         if (sale.category === "totalsales") {
@@ -816,7 +822,8 @@ export default {
     },
 
     async loadDataForLaborBoxes() {
-      this.loadingMiddleTables = true;
+      this.initBottomBoxTables();
+      this.loadingBottomBoxes = true;
       let data = await this.$store.dispatch("dashboardOps/getDataForLaborBox", {
         location: this.location.label,
         locationId: this.location.id,
@@ -918,7 +925,7 @@ export default {
             income.amount
           ).toFixed(2);
       }
-      this.loadingMiddleTables = false;
+      this.loadingBottomBoxes = false;
     },
 
     async calculateAllSales() {
@@ -996,51 +1003,15 @@ export default {
     initTopBoxes() {
       this.totalSales = "0";
       this.lastYearSales = "0";
-      (this.foodbev = {
-        sales_actual: null,
-        sales_target: null,
-        purchase_actual: null,
-        purchase_target: null,
-        cgs_actual: null,
-        cgs_target: null,
-        target: 0
-      }),
-        (this.beer = {
-          sales_actual: null,
-          sales_target: null,
-          purchase_actual: null,
-          purchase_target: null,
-          cgs_actual: null,
-          cgs_target: null,
-          target: 0
-        }),
-        (this.liquor = {
-          sales_actual: null,
-          sales_target: null,
-          purchase_actual: null,
-          purchase_target: null,
-          cgs_actual: null,
-          cgs_target: null,
-          target: 0
-        }),
-        (this.wine = {
-          sales_actual: null,
-          sales_target: null,
-          purchase_actual: null,
-          purchase_target: null,
-          cgs_actual: null,
-          cgs_target: null,
-          target: 0
-        }),
-        (this.apparel = {
-          sales_actual: null,
-          sales_target: null,
-          purchase_actual: null,
-          purchase_target: null,
-          cgs_actual: null,
-          cgs_target: null,
-          target: 0
-        });
+      this.foodbev.sales_actual = 0;
+      [this.foodbev, this.beer, this.liquor, this.wine].map(sale => {
+        sale.sales_actual = 0;
+        sale.sales_target = 0;
+        sale.purchase_actual = 0;
+        sale.purchase_target = 0;
+        sale.cgs_actual = 0;
+        sale.cgs_target = 0;
+      });
     },
     initTargetOnTopBox() {
       this.foodbev.target = 0;
@@ -1073,13 +1044,12 @@ export default {
         goal: 0,
         percentageOfGoal: 0
       }));
-
+    },
+    initBottomBoxTables() {
       this.labor = "0";
       this.management = "0";
       this.bOH = "0";
       this.fOH = "0";
-    },
-    initBottomBoxTables() {
       this.grossMargin = "0";
       this.iFO = "0";
       this.netIncome = "0";
@@ -1115,9 +1085,11 @@ export default {
       )
     );
     this.location = this.locationEntries[0];
-    await this.loadSalesForTopBoxes();
-    await this.loadSalesForMiddleBoxes();
-    await this.loadTargetForTopBoxes();
+    Promise.all([
+      this.loadSalesForTopBoxes(),
+      this.loadSalesForMiddleBoxes(),
+      this.loadTargetForTopBoxes()
+    ]);
   }
 };
 </script>
