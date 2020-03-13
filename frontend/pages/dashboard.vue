@@ -488,7 +488,7 @@ export default {
         let r = b ? b.revenue : 0;
         this.revenueSix.push([e.name, e.revenue, r]);
       });
-
+      console.log("revenueSix", this.revenueSix);
       this.g1loaded = true;
     },
     async loadGraph1Totals() {

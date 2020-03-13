@@ -12,6 +12,20 @@
         :collapse-transition="false"
         mode="vertical"
       >
+      <el-menu-item-group title="Report">
+        <el-menu-item>
+          <a
+              href="http://localhost:8000/api/report"
+              download
+          >
+              <span
+                  class="btn btn-primary"
+              >
+              Download
+              </span>
+          </a>
+        </el-menu-item>
+        </el-menu-item-group>
         <el-menu-item-group title="Application">
           <sidebar-item v-for="route in routes.user" :key="route.path" :item="route" :base-path="route.path" />
         </el-menu-item-group>
@@ -19,9 +33,11 @@
         <el-menu-item-group title="Admin" v-if="routes.admin.length">
           <sidebar-item v-for="route in routes.admin" :key="route.path" :item="route" :base-path="route.path" />
         </el-menu-item-group>
+        
       </el-menu>
 
     </el-scrollbar>
+    
   </div>
 </template>
 

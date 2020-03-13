@@ -81,7 +81,6 @@ class MiddleBoxForOpsQuery extends AuthenticatedQuery
             )
 SQL;
 
-Log::info($sql);
 
     return DB::connection('tenant')->select($sql);
   }

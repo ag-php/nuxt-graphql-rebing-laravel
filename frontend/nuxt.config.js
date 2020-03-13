@@ -7,7 +7,8 @@ module.exports = {
   },
   mode: 'universal',
   env: {
-    gqlEndpoint: process.env.GQL_ENDPOINT || 'http://127.0.0.1:8000/graphql'
+    gqlEndpoint: process.env.GQL_ENDPOINT || 'http://127.0.0.1:8000/graphql',
+    apiEndpoint: process.env.API_ENDPOINT || 'http://127.0.0.1:8000/api'
   },
   /*
   ** Headers of the page

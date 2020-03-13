@@ -75,5 +75,7 @@ export const actions = {
             }
         }`);
     return data.laborBoxForOps;
-  }
+  },
+
+  
 };

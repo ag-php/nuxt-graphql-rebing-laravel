@@ -1,7 +1,10 @@
 const GQL_ENDPOINT = process.env.gqlEndpoint
+const API_ENDPOINT = process.env.apiEndpoint
+
 const cookie = process.client ? require('js-cookie') : undefined
 
 import { GraphQLClient } from 'graphql-request'
+import axios from 'axios'
 
 export const state = () => ({
     id: 0,
@@ -68,6 +71,16 @@ export const actions = {
                 : {}
         )
     },
+
+    async downloadReport({ commit, state}, useAuth) {
+      console.log("hello");
+      const {data} = await axios.get(API_ENDPOINT + '/report', (state.token) ?
+      { headers: { 'Authorization': `Bearer ${state.token}` } }
+      : {});
+    },
+
+
+
     /**
      * Login and load User
      *

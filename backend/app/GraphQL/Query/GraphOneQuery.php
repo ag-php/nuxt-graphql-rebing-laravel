@@ -112,6 +112,7 @@ SQL;
           ORDER BY CAST(substring(`pldetailpivot`.`Period`, 2, 2) AS SIGNED) ) as `t1` GROUP BY `t1`.`p`
 SQL;
     }
+    Log::info($sql);
 
     return DB::connection('tenant')->select($sql);
   }

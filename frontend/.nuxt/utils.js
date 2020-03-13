@@ -133,7 +133,7 @@ export async function setContext (app, context) {
       payload: context.payload,
       error: context.error,
       base: '/',
-      env: {"gqlEndpoint":"http://127.0.0.1:8000/graphql","JWT_SECRET":"zMmcleggxQ74t9NnpKyTKRrmv7BvYmMh70mk7UgvZ5kOTIMdWLLGJ2mVSy69TJpk"}
+      env: {"gqlEndpoint":"http://127.0.0.1:8000/graphql","apiEndpoint":"http://127.0.0.1:8000/api","JWT_SECRET":"zMmcleggxQ74t9NnpKyTKRrmv7BvYmMh70mk7UgvZ5kOTIMdWLLGJ2mVSy69TJpk"}
     }
     // Only set once
     if (context.req) {

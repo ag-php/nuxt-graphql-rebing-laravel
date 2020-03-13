@@ -100,7 +100,7 @@ SQL;
     GROUP BY `master_fcst_web`.`FCSTDesc` $groupBy
 SQL;
 
-Log::info($sql);
+
 
     if (!$isParent) {
       $row = DB::connection('tenant')->select($sql)[0];

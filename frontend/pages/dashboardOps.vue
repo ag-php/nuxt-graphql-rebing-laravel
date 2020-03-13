@@ -185,6 +185,8 @@
                 :value="item"
               ></el-option>
             </el-select>
+            
+            <!-- <el-button type="warning" icon="el-icon-download" style="margin-top: 6px;" @click="downloadReport"></el-button> -->
           </el-col>
           <el-col :sm="24" :md="14" v-loading="loadingMiddleTables">
             <box-with-border>
@@ -752,7 +754,7 @@ export default {
         if (sale && sale.item) {
           switch (sale.item) {
             case "foodbevcgs":
-              this.foodbev.target = sale.amount.toFixed(2);
+              this.foodbev.target = sale.amount.toFixed(4);
               break;
             case "beercgs":
               this.beer.target = sale.amount.toFixed(2);
@@ -783,17 +785,15 @@ export default {
         }
       );
 
-      console.log("sales", sales);
-
       sales.forEach(sale => {
         if (sale.category === "totalsales") {
           if (sale.target.toLowerCase() === "actuals") {
-            this.totalSalesTable[sale.rankInCategory - 2].actual += sale.amount;
+            this.totalSalesTable[sale.rankInCategory - 2].actual += Math.abs(sale.amount);
             if (sale.rankInCategory == 2) {
               this.totalSalesTable[sale.rankInCategory - 2].actual;
             }
           } else
-            this.totalSalesTable[sale.rankInCategory - 2].goal += sale.amount;
+            this.totalSalesTable[sale.rankInCategory - 2].goal += Math.abs(sale.amount);
         } else if (sale.category === "opex") {
           if (sale.target.toLowerCase() === "actuals") {
             this.opexTable[sale.rankInCategory - 1].actual += sale.amount;
@@ -1054,6 +1054,10 @@ export default {
       this.iFO = "0";
       this.netIncome = "0";
       this.discounts = "0";
+    },
+
+    downloadReport() {
+      //let init = this.$store.dispatch("user/downloadReport");
     }
   },
   async mounted() {
@@ -1085,11 +1089,11 @@ export default {
       )
     );
     this.location = this.locationEntries[0];
-    Promise.all([
-      this.loadSalesForTopBoxes(),
-      this.loadSalesForMiddleBoxes(),
-      this.loadTargetForTopBoxes()
-    ]);
+    // Promise.all([
+    //   this.loadSalesForTopBoxes(),
+    //   this.loadSalesForMiddleBoxes(),
+    //   this.loadTargetForTopBoxes()
+    // ]);
   }
 };
 </script>

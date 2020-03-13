@@ -107,7 +107,7 @@ export default {
     salesData: {
       handler(val) {
         this.total = 
-          val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100/ val.sales_actual).toFixed(2) : 0
+          val.sales_actual && val.cgs_actual ? Number(val.cgs_actual * 100.00/ val.sales_actual).toFixed(2) : 0
         ;
         this.target = (Number(val.target) * 100 ).toFixed(2);
         this.sales = convertCurrencySales(val.sales_actual);
