@@ -62,7 +62,7 @@ export const mutations = {
   setLoadingInvestorReport(state, status) {
     state.loadingInvestorReport = status;
   },
-  setLoadingReport(state, status) {
+  setLoadingDetailReport(state, status) {
     state.loadingDetailReport = status;
   }
 };

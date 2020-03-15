@@ -12,15 +12,13 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <el-menu-item-group
-          title="Report"
-          v-loading="loadingReport"
-          element-loading-text="Downloading..."
-          element-loading-spinner="el-icon-loading"
-          element-loading-background="rgba(0, 0, 0, 0.8)"
-        >
+        <el-menu-item-group title="Report">
           <el-menu-item>
             <a
+              v-loading="loadingInvestorReport"
+              element-loading-text="Downloading..."
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(48, 65, 86, 0.8)"
               :href="apiUrl + '/investor-report'"
               @click.prevent="downloadReport('investor')"
             >
@@ -31,6 +29,10 @@
           </el-menu-item>
           <el-menu-item>
             <a
+              v-loading="loadingDetailReport"
+              element-loading-text="Downloading..."
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(48, 65, 86, 0.8)"
               :href="apiUrl + '/detail-report'"
               @click.prevent="downloadReport('detail')"
             >
@@ -81,7 +83,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["sidebar", "loadingReport"]),
+    ...mapGetters(["sidebar", "loadingInvestorReport", "loadingDetailReport"]),
     routes() {
       //return this.$router.options.routes
       return this.$store.state.user.routes;
