@@ -14,11 +14,22 @@ use Illuminate\Http\Request;
 */
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
+//   return $request->user();
 // });
 
-//Route::middleware('auth:api')->get('/report', 'ReportController@getReport');
-Route::get('/report', 'ReportController@getReport');
+
+// Route::post('/user', 'DashboardController@user');
+
+// Route::post('/authorize', 'DashboardController@authorize');
+
+// Route::post('/dashboard1', 'DashboardController@dashboard1');
+
+// Route::post('/dashboard', 'DashboardController@dashboard');
+
+Route::get('/investor-report', 'ReportController@getInvestorReport');
+
+Route::get('/detail-report', 'ReportController@getDetailReport');
+
 
 
 

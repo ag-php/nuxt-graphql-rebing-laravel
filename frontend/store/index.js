@@ -40,4 +40,5 @@ export const getters = {
     avatar: state => state.user.avatar,
     name: state => state.user.name,
     routes: state => state.user.routes,
+    loadingReport: state => state.user.loadingReport
 }
